@@ -15,10 +15,13 @@
       <div class="content-box">
         <!-- 轮播图内容 -->
         <div class="banner-box width flexbox">
-          <div class="list-box">
+          <!-- 左边轮播图内容 -->
+          <div class="list-box flexbox">
             <div class="goodsCate"
-                 v-for="(item, index) in bannerGoodList"
-                 :key="index">
+                 v-for="(item, index) in bannerCategory"
+                 :key="index"
+                 @mouseenter="bannerListHover(index)"
+                 @mouseleave="bannerCoverShow = false">
               <p class="top-title">
                 {{item.title}}
               </p>
@@ -29,20 +32,43 @@
             </div>
           </div>
           <div class="banner">
+            <!-- 轮播图遮罩层 -->
+            <div class="cover"
+                 v-if="bannerCoverShow">
+              <p>
+                {{bannerCategory[coverId].title}}
+              </p>
+              <p>
+                <span v-for="(item, index) in bannerCategory[coverId].subGoods"
+                      :key="index">{{bannerCategory[coverId].title}}</span>
+              </p>
+            </div>
             <div class="block">
-              <el-carousel height="150px">
-                <el-carousel-item v-for="item in 4"
-                                  :key="item">
-                  <div v-for="(item, index) in bannerGoodList.bannerData"
-                       :key="index">
-                    <img :src="item.img_url"
-                         alt="">
-                  </div>
+              <el-carousel height="300px">
+                <el-carousel-item v-for="(item, index) in bannerImgArr"
+                                  :key="index">
+                  <img :src="item.img_url"
+                       alt="">
                 </el-carousel-item>
               </el-carousel>
             </div>
           </div>
-          <div class="list-box"></div>
+          <!-- 右边内容 -->
+          <div class="list-box flexbox">
+            <div class="right-box flexbox j-start"
+                 v-for="(item, index) in rightBoxArr"
+                 :key="index">
+              <div class="img-box">
+                <span>{{index+1}}</span>
+                <img :src="item.img_url"
+                     alt="">
+              </div>
+              <div class="text-box">
+                <p>{{item.title}}</p>
+                <p>{{item.add_time | dateFilter}}</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -70,7 +96,12 @@ export default {
         { label: '购物商城' }
       ],
       navActiveId: 0,
-      bannerGoodList: []
+      bannerCategory: [],
+      bannerImgArr: [],
+      // 轮播图遮罩层是否显示
+      bannerCoverShow: false,
+      coverId: 0,
+      rightBoxArr: []
     }
   },
   beforeMount () {
@@ -80,8 +111,19 @@ export default {
     initData () {
       this.axios.get('/getBanner').then(res => {
         console.log(res)
-        this.bannerGoodList = res.data
+        // 右边列表数据
+        this.bannerCategory = res.data.categoryData
+        // 轮播图图片数据
+        this.bannerImgArr = res.data.bannerData
+        for (let i = 0; i < 4; i++) {
+          this.rightBoxArr.push(this.bannerImgArr[i])
+        }
       })
+    },
+    // 轮播图列表鼠标移入事件
+    bannerListHover (i) {
+      this.coverId = i
+      this.bannerCoverShow = true
     }
   }
 }
@@ -124,6 +166,8 @@ export default {
         margin: 10px auto;
         .list-box {
           width: 20%;
+          height: 100%;
+          flex-direction: column;
           .goodsCate {
             width: 90%;
             margin: 0 auto;
@@ -141,9 +185,67 @@ export default {
               }
             }
           }
+          .right-box {
+            width: 95%;
+            margin: 0 auto;
+            margin-bottom: 10px;
+            font-size: 12px;
+            text-align: left;
+            &:nth-child(1) span {
+              background-color: #f00;
+            }
+            .img-box {
+              position: relative;
+              span {
+                position: absolute;
+                top: 2px;
+                left: 2px;
+                width: 15px;
+                height: 15px;
+                font-size: 12px;
+                background-color: #fff;
+                text-align: center;
+                line-height: 15px;
+              }
+              img {
+                width: 50px;
+                height: 50px;
+                margin-right: 5px;
+              }
+            }
+          }
         }
         .banner {
           width: 60%;
+          position: relative;
+          .cover {
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.5);
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 10;
+            padding-left: 20px;
+            box-sizing: border-box;
+            p {
+              font-size: 12px;
+              text-align: left;
+              margin: 10px 0;
+              span {
+                margin-right: 10px;
+              }
+              &:nth-child(1) {
+                font-size: 14px;
+              }
+            }
+          }
+          .block {
+            img {
+              width: 100%;
+              height: 100%;
+            }
+          }
         }
       }
     }

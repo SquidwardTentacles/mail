@@ -4,18 +4,35 @@ const db = require('./connectDataBase')
 let saveData
 let dataBaseFunc
 let goodsListData
+let https
+let httpArr = [
+  {
+    // 获取轮播图数据
+    url: 'http://47.106.148.205:8899/site/goods/gettopdata/goods',
+    type: 'navbar'
+  },
+  {
+    // 获取商品列表数据
+    url: 'http://47.106.148.205:8899/site/goods/getgoodsgroup',
+    type: 'goodsList'
+  }
+]
 exports.saveData = () => {
   // return
-  http.get('http://47.106.148.205:8899/site/goods/gettopdata/goods', data => {
-    let backData = ''
-    data.on('data', chunk => {
-      backData += chunk
+  https = url => {
+    http.get(url, data => {
+      let backData = ''
+      data.on('data', chunk => {
+        backData += chunk
+      })
+      data.on('end', () => {
+        saveData(backData)
+      })
     })
-    data.on('end', () => {
-      // console.log(JSON.parse(backData))
-      saveData(backData)
-    })
-  })
+  }
+  for (let i = 0; i < httpArr.length; i++) {
+    https(httpArr[i.url])
+  }
   saveData = data => {
     data = JSON.parse(data)
     if (data.status === 0) {
@@ -53,9 +70,10 @@ exports.saveData = () => {
     }
   }
   goodsListData = (data, id) => {
+    // 通过id判断是否为轮播图数据
     // let indexGoodsList = data.message.toplist
-    let indexGoodsData = {}
-    data.map(curList => {
+    let indexGoodsData = []
+    data.map((curList, i) => {
       indexGoodsData = {
         id: curList.id,
         isbanner: id,
@@ -74,6 +92,8 @@ exports.saveData = () => {
     let selectSql = `select count(*) as total from ${dataBaseName} where id=?`
     db.base(selectSql, data.id, callback => {
       if (callback[0].total === 0) {
+        console.log(data[0])
+
         let goodsCateSetSql = `insert into ${dataBaseName} set ?`
         db.base(goodsCateSetSql, data, callback => {
           if (callback.affectedRows === 1) console.log('成功')
