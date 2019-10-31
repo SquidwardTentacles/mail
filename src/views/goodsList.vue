@@ -1,17 +1,6 @@
   <template>
   <div class="goodList">
-    <navList />
     <div class="content">
-      <div class="top-nav width">
-        <!-- 导航栏 -->
-        <div class="sub-box flexbox between">
-          <li v-for="(item, index) in navData"
-              :key="index"
-              :class="{'active':navActiveId===index}">
-            {{item.label}}
-          </li>
-        </div>
-      </div>
       <div class="content-box">
         <!-- 轮播图内容 -->
         <div class="banner-box width flexbox">
@@ -70,6 +59,36 @@
             </div>
           </div>
         </div>
+        <!-- 商品列表 -->
+        <div class="goods-list">
+          <div class="sub-list width"
+               v-for="(item, index) in goodsListArr"
+               :key="index">
+            <div class="title flexbox between">
+              <span>{{item.catetitle}}</span>
+              <span>
+                <span v-for="(items, index) in item.goodsList"
+                      :key="index">{{items.cateTitle}}</span>
+                <span>更多</span>
+              </span>
+            </div>
+            <div class="goods-list-detail flexbox j-start">
+              <div class="detail-box"
+                   v-for="(items, index) in item.goodsList"
+                   :key="index">
+                <router-link to="/goodsInfo">
+                  <img :src="items.img_url"
+                       alt="">
+                  <div class="introduce flexbox a-start">
+                    <p>{{items.artTitle}}</p>
+                    <p><span class="price">{{items.market_price}}</span> <span>元</span></p>
+                    <p class="flexbox between"><span>市场价：<del>{{items.sell_price}}</del></span> <span>库存：{{items.stock_quantity}}</span></p>
+                  </div>
+                </router-link>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
     </div>
@@ -77,14 +96,8 @@
 </template>
 
 <script>
-// @ is an alias to /src
-import navList from '@/components/navList.vue'
-
 export default {
   name: 'home',
-  components: {
-    navList
-  },
   data () {
     return {
       navData: [
@@ -101,7 +114,9 @@ export default {
       // 轮播图遮罩层是否显示
       bannerCoverShow: false,
       coverId: 0,
-      rightBoxArr: []
+      rightBoxArr: [],
+      // 商品列表
+      goodsListArr: []
     }
   },
   beforeMount () {
@@ -109,14 +124,20 @@ export default {
   },
   methods: {
     initData () {
+      // 获取轮播图信息
       this.axios.get('/getBanner').then(res => {
-        console.log(res)
         // 右边列表数据
         this.bannerCategory = res.data.categoryData
         // 轮播图图片数据
         this.bannerImgArr = res.data.bannerData
         for (let i = 0; i < 4; i++) {
           this.rightBoxArr.push(this.bannerImgArr[i])
+        }
+      })
+      // 获取商品列表
+      this.axios.get('/getGoodsSesson').then(res => {
+        if (res.errcode === 0) {
+          this.goodsListArr = res.data
         }
       })
     },
@@ -130,32 +151,8 @@ export default {
 </script>
 <style lang="less" scoped>
 .goodList {
-  .width {
-    max-width: 1100px;
-    margin: 0 auto;
-  }
   .content {
     margin: 0 auto;
-    .top-nav {
-      width: 100%;
-      background-color: #333;
-      border-radius: 5px;
-      margin: 3px auto;
-      color: #fff;
-      font-size: 16px;
-      .sub-box {
-        width: 85%;
-        margin: 0 auto;
-        li {
-          padding: 10px 20px;
-          margin-right: 5px;
-          cursor: pointer;
-          &.active {
-            color: #008000;
-          }
-        }
-      }
-    }
     .content-box {
       width: 100%;
       background-color: #f5f5f5;
@@ -244,6 +241,51 @@ export default {
             img {
               width: 100%;
               height: 100%;
+            }
+          }
+        }
+      }
+      .goods-list {
+        margin-top: 50px;
+        .sub-list {
+          .title {
+            padding: 0 10px;
+            box-sizing: border-box;
+            margin: 20px 0 10px 0;
+            span {
+              margin-right: 10px;
+              &:nth-child(2) {
+                font-size: 12px;
+              }
+            }
+          }
+          .goods-list-detail {
+            width: 100%;
+            align-items: start;
+            .detail-box {
+              width: 260px;
+              min-height: 260px;
+              margin-right: 15px;
+              background-color: #fff;
+              padding: 10px;
+              box-sizing: border-box;
+              img {
+                width: 100%;
+                max-height: 180px;
+              }
+              .introduce {
+                flex-direction: column;
+                height: 120px;
+                p {
+                  font-size: 12px;
+                  text-align: left;
+                  margin-top: 7px;
+                  .price {
+                    color: #f00;
+                    font-size: 16px;
+                  }
+                }
+              }
             }
           }
         }

@@ -12,8 +12,6 @@ Vue.config.productionTip = false
 Vue.filter('dateFilter', function (num, icon, backStyle) {
   if (!num) return ''
   var now = new Date(num)
-  console.log(now)
-
   var y = now.getFullYear()
   var m = now.getMonth() + 1
   var d = now.getDate()

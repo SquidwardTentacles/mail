@@ -12,6 +12,10 @@
   text-align: center;
   color: #2c3e50;
 }
+.width {
+  max-width: 1100px;
+  margin: 0 auto;
+}
 body {
   padding: 0;
   margin: 0;
@@ -41,6 +45,7 @@ body {
 }
 a {
   text-decoration: none;
+  color: #2c3e50;
 }
 p,
 h1,
