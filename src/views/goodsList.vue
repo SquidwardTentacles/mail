@@ -76,7 +76,7 @@
               <div class="detail-box"
                    v-for="(items, index) in item.goodsList"
                    :key="index">
-                <router-link to="/goodsInfo">
+                <router-link :to="'/goodsInfo?artid='+items.artID">
                   <img :src="items.img_url"
                        alt="">
                   <div class="introduce flexbox a-start">

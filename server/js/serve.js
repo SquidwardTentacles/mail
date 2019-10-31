@@ -63,3 +63,17 @@ exports.getGoodsSesson = (req, res) => {
     }
   })
 }
+// 获取商品详细信息
+exports.getGoodsDetailSes = (req, res) => {
+  // res.end(req.query.artid)
+  let sql = `select * from goodsinfo where id = ${req.query.artid}`
+  db.base(sql, {}, callback => {
+    if (callback) {
+      let obj = {
+        errcode: 0,
+        data: callback[0]
+      }
+      res.end(JSON.stringify(obj))
+    }
+  })
+}
