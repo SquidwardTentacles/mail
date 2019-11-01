@@ -6,7 +6,6 @@ import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import './assets/js/axios'
 Vue.use(ElementUI)
-
 Vue.config.productionTip = false
 
 Vue.filter('dateFilter', function (num, icon, backStyle) {

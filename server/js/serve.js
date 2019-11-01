@@ -71,9 +71,16 @@ exports.getGoodsDetailSes = (req, res) => {
     if (callback) {
       let obj = {
         errcode: 0,
-        data: callback[0]
+        data: {
+          goodsInfo: callback[0]
+        }
       }
-      res.end(JSON.stringify(obj))
+      let sqlImg = `select * from imgList where article_id = ${req.query.artid}`
+      db.base(sqlImg, {}, back => {
+        console.log(back)
+        obj.data.imgList = back
+        res.end(JSON.stringify(obj))
+      })
     }
   })
 }

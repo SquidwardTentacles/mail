@@ -120,10 +120,8 @@ exports.saveData = () => {
           }
         })
       } else if (type === 'goodsDetail') {
-        // console.log(data)
+        // 商品详情信息存储
         let infoArr = data.message.goodsinfo
-        console.log(typeof infoArr)
-
         let obj = {
           // add_time: infoArr.add_time ? infoArr.add_time : new Date(),
           category_id: infoArr.category_id,
@@ -152,6 +150,19 @@ exports.saveData = () => {
           user_name: infoArr.user_name,
           zhaiyao: infoArr.zhaiyao
         }
+        let imgList = data.message.imglist
+        let imgListObj = {}
+        imgList.map(currentData => {
+          imgListObj = {}
+          imgListObj = {
+            article_id: currentData.article_id,
+            channel_id: currentData.channel_id,
+            id: currentData.id,
+            original_path: currentData.original_path,
+            thumb_path: currentData.thumb_path
+          }
+          dataBaseFunc('imgList', imgListObj)
+        })
         dataBaseFunc('goodsinfo', obj)
       }
     } else {
