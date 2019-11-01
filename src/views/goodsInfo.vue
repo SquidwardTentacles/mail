@@ -29,7 +29,7 @@
               </div>
               <div class="flexbox j-start buy-num">
                 <span class="label">购买数量：</span>
-                <div><span class="add-icon one">-</span> <span class="num">1</span> <span class="add-icon two">+</span></div>
+                <p><span class="add-icon one">-</span> <span class="num">1</span> <span class="add-icon two">+</span></p>
               </div>
             </div>
           </div>
@@ -129,7 +129,7 @@ export default {
               margin-bottom: 10px;
               vertical-align: middle;
               &.buy-num {
-                div {
+                p {
                   border: 1px solid #dcdfe6;
                   border-radius: 5px;
                   span {
