@@ -4,8 +4,34 @@
     <div class="flexbox between outer-box width">
       <div class="left-box">
         <div class="detail-box">
-          <div class="buy-goods">
-
+          <div class="buy-goods flexbox between">
+            <div class="img-box"
+                 v-if="show">
+              <img :src="images.normal_size[0].url"
+                   alt="">
+            </div>
+            <div class="right-detail-message">
+              <div class="title">
+                <p>华为（HUAWEI）荣耀6Plus 16G双4G版</p>
+                <span class="label">支持联通移动电信三网4G，5.5英寸，1920x1080分辨率，800万像素摄像头，Touch ID指纹识别传感器</span>
+              </div>
+              <div>
+                <span class="label">货号：</span>
+                <span class="content">SD7159810321</span>
+              </div>
+              <div>
+                <span class="label">市场价：</span>
+                <del><span class="content">5000</span></del>
+              </div>
+              <div>
+                <span class="label">销售价：</span>
+                <span class="now-price">￥4000</span>
+              </div>
+              <div class="flexbox j-start buy-num">
+                <span class="label">购买数量：</span>
+                <div><span class="add-icon one">-</span> <span class="num">1</span> <span class="add-icon two">+</span></div>
+              </div>
+            </div>
           </div>
           <div v-html="goodsDataArr.content"
                class="goods-ses-show width"></div>
@@ -22,7 +48,16 @@
 export default {
   data () {
     return {
-      goodsDataArr: []
+      goodsDataArr: [],
+      images: {
+        normal_size: [
+          { id: '', url: '' }
+        ],
+        large_size: [
+          { id: '', url: '' }
+        ]
+      },
+      show: false
     }
   },
   mounted () {
@@ -36,8 +71,6 @@ export default {
           let imgList = res.data.imgList
           // this.images.thumbs[0].url = imgList[0].original_path
           // this.images.thumbs[1].url = imgList[0].thumb_path
-          this.images.normal_size[0].url = imgList[1].original_path
-          this.images.normal_size[1].url = imgList[1].thumb_path
           imgList.map((cur, index) => {
             let obj = {
               id: index,
@@ -76,8 +109,82 @@ export default {
       background-color: #fff;
       padding: 10px;
       box-sizing: border-box;
-      // .goods-ses-show {
-      // }
+      .detail-box {
+        .buy-goods {
+          height: 350px;
+          .img-box {
+            height: 100%;
+            img {
+              width: 350px;
+              margin: 10px;
+              height: 100%;
+            }
+          }
+          .right-detail-message {
+            font-size: 12px;
+            height: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            div {
+              margin-bottom: 10px;
+              vertical-align: middle;
+              &.buy-num {
+                div {
+                  border: 1px solid #dcdfe6;
+                  border-radius: 5px;
+                  span {
+                    vertical-align: middle;
+                    display: inline-block;
+                    text-align: center;
+                    line-height: 30px;
+                    height: 30px;
+                    &.add-icon {
+                      width: 27px;
+                      height: 30px;
+                      background-color: #f5f7fa;
+                      font-size: 16px;
+                      cursor: pointer;
+                      &.one {
+                        border-right: 1px solid #dcdfe6;
+                      }
+                      &.two {
+                        border-left: 1px solid #dcdfe6;
+                      }
+                    }
+                    &.num {
+                      width: 60px;
+                    }
+                  }
+                }
+              }
+              .now-price {
+                margin-right: 5px;
+                color: #f40;
+                font-size: 24px;
+                font-weight: 700;
+                // font-style: normal;
+              }
+            }
+            .title {
+              margin-bottom: 10px;
+              p {
+                color: #555;
+                line-height: 1.1em;
+                font-size: 18px;
+                margin-bottom: 5px;
+              }
+              .label {
+                font-size: 14px;
+                margin: 0;
+              }
+            }
+            .label {
+              color: #888;
+              margin-right: 10px;
+            }
+          }
+        }
+      }
     }
     .right-box {
       padding: 10px;
