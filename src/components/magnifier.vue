@@ -99,7 +99,17 @@ export default {
         let bigMT = (top * topScale).toFixed(0)
         $('#img_u img').css('marginLeft', '-' + bigML + 'px').css('marginTop', '-' + bigMT + 'px')
       })
+      // 鼠标移出隐藏放大图片
+      $('#zhezhao').mouseleave(function () {
+        $('#img_u').hide()
+        $('#magnifier').hide()
+      })
+      // 缩略图列表边框隐藏
+      $('#img_x').mouseleave(function () {
+        $(this).children('li').css('border', '2px solid transparent')
+      })
     }
+
   }
 }
 </script>
