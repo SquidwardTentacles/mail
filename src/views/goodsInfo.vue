@@ -1,14 +1,17 @@
 <template>
   <div class="goods-info">
-    <p class="path-detail width">当前位置：首页 > 购物商城 > 商品详情</p>
+    <p class="path-detail width">当前位置：<router-link to="/">首页 > </router-link>
+      <router-link to="/">购物商城</router-link> > 商品详情
+    </p>
     <div class="flexbox between outer-box width">
       <div class="left-box">
         <div class="detail-box">
           <div class="buy-goods flexbox between">
             <div class="img-box"
                  v-if="show">
-              <img :src="images.normal_size[0].url"
-                   alt="">
+              <!-- <img :src="images.normal_size[0].url"
+                   alt=""> -->
+              <magnifier :imgList="imgList"></magnifier>
             </div>
             <div class="right-detail-message">
               <div class="title">
@@ -45,10 +48,15 @@
   </div>
 </template>
 <script>
+import magnifier from '../components/magnifier'
 export default {
+  components: {
+    magnifier
+  },
   data () {
     return {
       goodsDataArr: [],
+      imgList: [],
       images: {
         normal_size: [
           { id: '', url: '' }
@@ -68,22 +76,24 @@ export default {
       this.axios.get(`/getGoodsDetailSes?artid=${this.$route.query.artid}`).then(res => {
         if (res.errcode === 0) {
           this.goodsDataArr = res.data.goodsInfo
-          let imgList = res.data.imgList
+          this.imgList = res.data.imgList
+          console.log(this.imgList)
+
           // this.images.thumbs[0].url = imgList[0].original_path
           // this.images.thumbs[1].url = imgList[0].thumb_path
-          imgList.map((cur, index) => {
-            let obj = {
-              id: index,
-              url: cur.original_path
-            }
-            this.images.normal_size[index] = obj
-            let largeUrl = {
-              id: index,
-              url: cur.thumb_path
-            }
-            this.images.large_size[index] = largeUrl
-          })
-          console.log(this.images)
+          // imgList.map((cur, index) => {
+          //   let obj = {
+          //     id: index,
+          //     url: cur.original_path
+          //   }
+          //   this.images.normal_size[index] = obj
+          //   let largeUrl = {
+          //     id: index,
+          //     url: cur.thumb_path
+          //   }
+          //   this.images.large_size[index] = largeUrl
+          // })
+          // console.log(this.images)
 
           // this.images.large_size[0].url = imgList[2].original_path
           // this.images.large_size[1].url = imgList[2].thumb_path
@@ -112,11 +122,11 @@ export default {
       .detail-box {
         .buy-goods {
           height: 350px;
+          margin-bottom: 10px;
           .img-box {
             height: 100%;
             img {
               width: 350px;
-              margin: 10px;
               height: 100%;
             }
           }
@@ -201,6 +211,14 @@ export default {
     font-size: 14px;
     p {
       text-align: left;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      img {
+        align-self: center;
+        max-width: 100%;
+        vertical-align: middle;
+      }
       &.ql-align-center {
         text-align: center;
       }
