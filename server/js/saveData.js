@@ -24,7 +24,7 @@ let httpArr = [
 // 获取商品详细信息 结尾直接加上商品id(不用键值)
 let getGoodsDetailUrl = 'http://47.106.148.205:8899/site/goods/getgoodsinfo/'
 exports.saveData = () => {
-  // return
+  return
   https = (url, type) => {
     http.get(url, data => {
       let backData = ''

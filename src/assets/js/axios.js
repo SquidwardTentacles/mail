@@ -1,7 +1,10 @@
 import Vue from 'vue'
 import axios from 'axios'
-
-axios.defaults.baseURL = 'http://192.168.1.14:3000'
+// 引入网站访问基地址
+import baseAddress from '../../../server/js/baseAddress'
+// axios.defaults.baseURL = 'http://192.168.1.14:3000'
+// axios.defaults.baseURL = 'http://127.0.0.1:3000'
+axios.defaults.baseURL = baseAddress.option.domainName + baseAddress.option.port
 
 Vue.prototype.axios = axios
 // 添加请求拦截器

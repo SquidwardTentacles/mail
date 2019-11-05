@@ -11,7 +11,8 @@
                  v-if="show">
               <!-- <img :src="images.normal_size[0].url"
                    alt=""> -->
-              <magnifier :imgList="imgList"></magnifier>
+              <sefMagnifier :imgList="imgList"></sefMagnifier>
+              <!-- <magnifier :imgList="imgList"></magnifier> -->
             </div>
             <div class="right-detail-message">
               <div class="title">
@@ -48,10 +49,12 @@
   </div>
 </template>
 <script>
-import magnifier from '../components/magnifier'
+// import magnifier from '../components/magnifier'
+import sefMagnifier from '../components/selfMagnifier'
 export default {
   components: {
-    magnifier
+    // magnifier
+    sefMagnifier
   },
   data () {
     return {

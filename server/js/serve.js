@@ -4,6 +4,8 @@ let backData = {
   data: {}
 }
 exports.getBanner = (req, res) => {
+  console.log('getBanner')
+
   let sql = 'select * from navgoodscategory'
   let categoryData = {}
   db.base(sql, {}, callback => {

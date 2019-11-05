@@ -4,7 +4,7 @@ saveData.saveData()
 const express = require('express')
 const app = express()
 // 端口域名封装
-const option = require('./js/option')
+const baseAddress = require('./js/baseAddress')
 const router = require('./js/router')
 // 引入body-parser插件 处理请求参数
 const bodyParser = require('body-parser')
@@ -34,6 +34,6 @@ app.use(function (req, res, next) {
 
 app.use(router)
 
-app.listen(option.option.port, () => {
-  console.log('listen.......', option.option.port)
+app.listen(baseAddress.option.port, () => {
+  console.log('listen.......', baseAddress.option.port)
 })
