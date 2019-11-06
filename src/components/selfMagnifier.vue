@@ -140,12 +140,12 @@ export default {
       magnifierEle.style.top = top + 'px'
       // 放大的图片位移通过使用margin改变图片的位置 使用比例换算出移动的距离
       let thumbnailImgEle = document.getElementById('thumbnailImg')
-      // let showGoodsImgEle = document.getElementById('showGoodsImg')
-      let leftScale = parseFloat((left / thumbnailImgEle.offsetWidth).toFixed(2))
-      let topScale = parseFloat((top / thumbnailImgEle.offsetHeight).toFixed(2))
+      let showGoodsImgEle = document.getElementById('showGoodsImg')
+      let leftScale = parseFloat((thumbnailImgEle.offsetWidth / (showGoodsImgEle.offsetWidth - magnifierWidth)).toFixed(2))
+      let topScale = parseFloat((thumbnailImgEle.offsetHeight / (showGoodsImgEle.offsetHeight - magnifierHeight)).toFixed(2))
 
-      thumbnailImgEle.style.marginLeft = '-' + (leftScale * thumbnailImgEle.offsetWidth) + 'px'
-      thumbnailImgEle.style.marginTop = '-' + (topScale * thumbnailImgEle.offsetHeight) + 'px'
+      thumbnailImgEle.style.marginLeft = '-' + (leftScale * left) + 'px'
+      thumbnailImgEle.style.marginTop = '-' + (topScale * top) + 'px'
     }
   }
 }
