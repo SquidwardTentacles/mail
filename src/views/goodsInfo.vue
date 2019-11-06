@@ -6,13 +6,11 @@
     <div class="flexbox between outer-box width">
       <div class="left-box">
         <div class="detail-box">
+          <!-- <magnifier :imgList="imgList"></magnifier> -->
           <div class="buy-goods flexbox between">
             <div class="img-box"
                  v-if="show">
-              <!-- <img :src="images.normal_size[0].url"
-                   alt=""> -->
-              <sefMagnifier :imgList="imgList"></sefMagnifier>
-              <!-- <magnifier :imgList="imgList"></magnifier> -->
+              <sefMagnifier :magnifierImgArr="imgList"></sefMagnifier>
             </div>
             <div class="right-detail-message">
               <div class="title">
@@ -53,20 +51,16 @@
 import sefMagnifier from '../components/selfMagnifier'
 export default {
   components: {
-    // magnifier
+    // magnifier,
     sefMagnifier
   },
   data () {
     return {
       goodsDataArr: [],
-      imgList: [],
-      images: {
-        normal_size: [
-          { id: '', url: '' }
-        ],
-        large_size: [
-          { id: '', url: '' }
-        ]
+      imgList: {
+        showImg: [],
+        magnifier: [],
+        requestOk: false
       },
       show: false
     }
@@ -79,23 +73,23 @@ export default {
       this.axios.get(`/getGoodsDetailSes?artid=${this.$route.query.artid}`).then(res => {
         if (res.errcode === 0) {
           this.goodsDataArr = res.data.goodsInfo
-          this.imgList = res.data.imgList
+          let imgList = res.data.imgList
           console.log(this.imgList)
 
           // this.images.thumbs[0].url = imgList[0].original_path
           // this.images.thumbs[1].url = imgList[0].thumb_path
-          // imgList.map((cur, index) => {
-          //   let obj = {
-          //     id: index,
-          //     url: cur.original_path
-          //   }
-          //   this.images.normal_size[index] = obj
-          //   let largeUrl = {
-          //     id: index,
-          //     url: cur.thumb_path
-          //   }
-          //   this.images.large_size[index] = largeUrl
-          // })
+          imgList.map((cur, index) => {
+            let obj = {
+              id: index,
+              src: cur.original_path
+            }
+            this.imgList.showImg.push(obj)
+            let largeUrl = {
+              id: index,
+              src: cur.thumb_path
+            }
+            this.imgList.magnifier.push(largeUrl)
+          })
           // console.log(this.images)
 
           // this.images.large_size[0].url = imgList[2].original_path

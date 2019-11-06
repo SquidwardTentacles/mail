@@ -4,6 +4,7 @@
          id='outerBox'>
       <!-- 放大图片 -->
       <div class="magnifier-box"
+           v-show="elemenImgShow"
            id="thumbnailBox">
         <div class="inner-box">
           <img id="thumbnailImg"
@@ -16,6 +17,7 @@
            id="imgShowBox">
         <!-- 发大镜图片 -->
         <img src="../assets/img/magnifier.png"
+             v-show="elemenImgShow"
              alt=""
              class="magnifier-img"
              id="magnifierImg">
@@ -23,11 +25,12 @@
              alt=""
              id="showGoodsImg">
         <div class="transparent"
-             @mousemove="magnifiermove($event)"></div>
+             @mousemove="magnifiermove($event)"
+             @mouseleave="elemenImgShow = false"></div>
       </div>
       <!-- 缩略图 -->
       <div class="img-thumbnail flexbox j-start">
-        <li v-for="(item, index) in magnifierImgArr.thumbnail"
+        <li v-for="(item, index) in thumbnailForArr"
             :key="index"
             @mouseenter="thumbnailEnter(index)"
             :class="{'active':imgIndex===index}">
@@ -41,66 +44,80 @@
 </template>
 <script>
 export default {
+  props: ['magnifierImgArr'],
   data () {
     return {
-      magnifierImgArr: {
-        thumbnail: [
-          {
-            src: require('../assets/img/letter-img/22628333-1_x_2.jpg')
-          },
-          {
-            src: require('../assets/img/letter-img/22628333-2_x_2.jpg')
-          },
-          {
-            src: require('../assets/img/letter-img/22628333-3_x_2.jpg')
-          },
-          {
-            src: require('../assets/img/letter-img/22628333-4_x_2.jpg')
-          },
-          {
-            src: require('../assets/img/letter-img/22628333-5_x_2.jpg')
-          }
-        ],
-        showImg: [
-          {
-            src: require('../assets/img/center/22628333-1_w_2.jpg')
-          },
-          {
-            src: require('../assets/img/center/22628333-2_w_2.jpg')
-          },
-          {
-            src: require('../assets/img/center/22628333-3_w_2.jpg')
-          },
-          {
-            src: require('../assets/img/center/22628333-4_w_2.jpg')
-          },
-          {
-            src: require('../assets/img/center/22628333-5_w_2.jpg')
-          }
-        ],
-        magnifier: [
-          {
-            src: require('../assets/img/big/22628333-1_u_2.jpg')
-          },
-          {
-            src: require('../assets/img/big/22628333-2_u_2.jpg')
-          },
-          {
-            src: require('../assets/img/big/22628333-3_u_2.jpg')
-          },
-          {
-            src: require('../assets/img/big/22628333-4_u_2.jpg')
-          },
-          {
-            src: require('../assets/img/big/22628333-5_u_2.jpg')
-          }
-        ]
-      },
-      imgIndex: 0
+      // magnifierImgArr: {
+      //   // 缩略图图片数组
+      //   thumbnail: [
+      //     {
+      //       src: require('../assets/img/letter-img/22628333-1_x_2.jpg')
+      //     },
+      //     {
+      //       src: require('../assets/img/letter-img/22628333-2_x_2.jpg')
+      //     },
+      //     {
+      //       src: require('../assets/img/letter-img/22628333-3_x_2.jpg')
+      //     },
+      //     {
+      //       src: require('../assets/img/letter-img/22628333-4_x_2.jpg')
+      //     },
+      //     {
+      //       src: require('../assets/img/letter-img/22628333-5_x_2.jpg')
+      //     }
+      //   ],
+      //   // 要放大的图片数组
+      //   showImg: [
+      //     {
+      //       src: require('../assets/img/center/22628333-1_w_2.jpg')
+      //     },
+      //     {
+      //       src: require('../assets/img/center/22628333-2_w_2.jpg')
+      //     },
+      //     {
+      //       src: require('../assets/img/center/22628333-3_w_2.jpg')
+      //     },
+      //     {
+      //       src: require('../assets/img/center/22628333-4_w_2.jpg')
+      //     },
+      //     {
+      //       src: require('../assets/img/center/22628333-5_w_2.jpg')
+      //     }
+      //   ],
+      //   // 放大的图片数组
+      //   magnifier: [
+      //     {
+      //       src: require('../assets/img/big/22628333-1_u_2.jpg')
+      //     },
+      //     {
+      //       src: require('../assets/img/big/22628333-2_u_2.jpg')
+      //     },
+      //     {
+      //       src: require('../assets/img/big/22628333-3_u_2.jpg')
+      //     },
+      //     {
+      //       src: require('../assets/img/big/22628333-4_u_2.jpg')
+      //     },
+      //     {
+      //       src: require('../assets/img/big/22628333-5_u_2.jpg')
+      //     }
+      //   ]
+      // },
+      imgIndex: 0,
+      elemenImgShow: false
     }
   },
   mounted () {
-    this.initData()
+
+  },
+  computed: {
+    thumbnailForArr () {
+      if (this.magnifierImgArr.thumbnail && this.magnifierImgArr.thumbnail.length) {
+        return this.magnifierImgArr.thumbnail
+      } else {
+        return this.magnifierImgArr.showImg
+      }
+    }
   },
   methods: {
     // 缩略图鼠标移入事件
@@ -109,13 +126,17 @@ export default {
     },
     initData () {
       // 将放大盒子向右移动
-      let outerBoxWidth = parseInt(document.getElementById('outerBox').offsetWidth)
+      let outerBoxWidth = parseInt(document.getElementById('imgShowBox').offsetWidth)
       // 放大镜盒子
       let thumbnailBox = document.getElementById('thumbnailBox')
-      thumbnailBox.style.left = (outerBoxWidth + 20) + 'px'
+      thumbnailBox.style.left = (outerBoxWidth + 15) + 'px'
       // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     },
     magnifiermove (e) {
+      // 有鼠标事件才加载大图片的位移 以解决在数据未加载之前就赋值了错误的位移
+      this.initData()
+      // 鼠标移入展示图片
+      this.elemenImgShow = true
       // console.log(e.offsetX)
       let magnifierEle = document.getElementById('magnifierImg')
       // 商品图片大盒子的宽高
@@ -140,9 +161,11 @@ export default {
       magnifierEle.style.top = top + 'px'
       // 放大的图片位移通过使用margin改变图片的位置 使用比例换算出移动的距离
       let thumbnailImgEle = document.getElementById('thumbnailImg')
-      let showGoodsImgEle = document.getElementById('showGoodsImg')
-      let leftScale = parseFloat((thumbnailImgEle.offsetWidth / (showGoodsImgEle.offsetWidth - magnifierWidth)).toFixed(2))
-      let topScale = parseFloat((thumbnailImgEle.offsetHeight / (showGoodsImgEle.offsetHeight - magnifierHeight)).toFixed(2))
+      // let showGoodsImgEle = document.getElementById('showGoodsImg')
+      let leftScale = parseFloat((thumbnailImgEle.offsetWidth / (outerBoxWidth - magnifierWidth)).toFixed(2))
+      let topScale = parseFloat((thumbnailImgEle.offsetHeight / (outerBoxHeight - magnifierHeight)).toFixed(2))
+      // let leftScale = parseFloat((thumbnailImgEle.offsetWidth / (showGoodsImgEle.offsetWidth - magnifierWidth)).toFixed(2))
+      // let topScale = parseFloat((thumbnailImgEle.offsetHeight / (showGoodsImgEle.offsetHeight - magnifierHeight)).toFixed(2))
 
       thumbnailImgEle.style.marginLeft = '-' + (leftScale * left) + 'px'
       thumbnailImgEle.style.marginTop = '-' + (topScale * top) + 'px'
@@ -189,6 +212,7 @@ export default {
     .img-thumbnail {
       margin-top: 10px;
       height: 54px;
+      overflow: auto;
       li {
         width: 50px;
         height: 50px;
