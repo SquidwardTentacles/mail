@@ -8,32 +8,49 @@
            ref="leftBox">
         <div class="detail-box">
           <!-- <magnifier :imgList="imgList"></magnifier> -->
-          <div class="buy-goods flexbox between">
+          <div class="buy-goods">
             <div class="img-box"
                  v-if="show">
               <sefMagnifier :goodsBoxWidth="goodsBoxWidth"
-                            :magnifierImgArr="imgList"></sefMagnifier>
+                            :magnifierImgArr="imgList"
+                            :reload="reload"></sefMagnifier>
             </div>
-            <div class="right-detail-message">
-              <div class="title">
-                <p>华为（HUAWEI）荣耀6Plus 16G双4G版</p>
-                <span class="label">支持联通移动电信三网4G，5.5英寸，1920x1080分辨率，800万像素摄像头，Touch ID指纹识别传感器</span>
-              </div>
+            <div class="right-detail-message flexbox">
               <div>
-                <span class="label">货号：</span>
-                <span class="content">SD7159810321</span>
+                <div class="title">
+                  <p>{{goodsInfo.sub_title}}</p>
+                  <span class="label">{{goodsInfo.zhaiyao}}</span>
+                </div>
+                <div>
+                  <span class="label">货号：</span>
+                  <span class="content">SD7159810321</span>
+                </div>
+                <div>
+                  <span class="label">市场价：</span>
+                  <del><span class="content">5000</span></del>
+                </div>
+                <div>
+                  <span class="label">销售价：</span>
+                  <span class="now-price">￥4000</span>
+                </div>
+                <div class="flexbox j-start buy-num">
+                  <span class="label">购买数量：</span>
+                  <p><span class="add-icon one"
+                          @click="numReduce">-</span> <span class="num">{{buyNum}}</span> <span class="add-icon two"
+                          @click="numAdd(goodsInfo.stock_quantity)">+</span></p>
+                </div>
+                <div class="flexbox j-start buy-num">
+                  <span class="label">库存：</span>
+                  <span>{{goodsInfo.stock_quantity}} 件</span>
+                </div>
               </div>
-              <div>
-                <span class="label">市场价：</span>
-                <del><span class="content">5000</span></del>
-              </div>
-              <div>
-                <span class="label">销售价：</span>
-                <span class="now-price">￥4000</span>
-              </div>
-              <div class="flexbox j-start buy-num">
-                <span class="label">购买数量：</span>
-                <p><span class="add-icon one">-</span> <span class="num">1</span> <span class="add-icon two">+</span></p>
+              <div class="flexbox j-start btn">
+                <div class="buy">
+                  立即购买
+                </div>
+                <div class="add-car">
+                  加入购物车
+                </div>
               </div>
             </div>
           </div>
@@ -42,7 +59,22 @@
         </div>
       </div>
       <div class="right-box">
-        <p class="">推荐商品</p>
+        <p class="right-goods-title">推荐商品</p>
+        <div class="right-goods-list"
+             v-for="(item, index) in rightListArr"
+             :key="index">
+          <div class=" flexbox j-start"
+               @click="initData(item.artID)">
+            <div class="img-boxr">
+              <img :src="item.img_url"
+                   alt="">
+            </div>
+            <div class="text-box">
+              <p>{{item.artTitle}}</p>
+              <span>{{item.add_time | dateFilter}}</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -61,24 +93,42 @@ export default {
       goodsDataArr: [],
       imgList: {
         showImg: [],
-        magnifier: [],
-        requestOk: false
+        magnifier: []
       },
       show: false,
-      goodsBoxWidth: ''
+      goodsBoxWidth: '',
+      rightListArr: [],
+      reload: 0,
+      goodsInfo: {},
+      // 购买数量
+      buyNum: 1,
+      loading: ''
     }
   },
   mounted () {
     // 获取到商品展示区域盒子的宽高
     this.goodsBoxWidth = this.$refs.leftBox.offsetWidth
-    this.initData()
+    this.initData(this.$route.query.artid)
   },
   methods: {
-    initData () {
-      this.axios.get(`/getGoodsDetailSes?artid=${this.$route.query.artid}`).then(res => {
+    initData (id) {
+      this.loading = this.$loading({
+        lock: true,
+        text: 'Loading',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)'
+      })
+      this.axios.get(`/getGoodsDetailSes?artid=${id}`).then(res => {
         if (res.errcode === 0) {
+          this.reload = 1
           this.goodsDataArr = res.data.goodsInfo
           let imgList = res.data.imgList
+          // 拼接商品图片信息
+          this.imgList = {
+            showImg: [],
+            magnifier: []
+          }
+          // 清空数组
           imgList.map((cur, index) => {
             let obj = {
               id: index,
@@ -90,10 +140,30 @@ export default {
               src: cur.thumb_path
             }
             this.imgList.magnifier.push(largeUrl)
+            this.reload = 0
           })
           this.show = true
+          // 右边列表
+          this.rightListArr = res.data.rightList
+          this.goodsInfo = res.data.goodsInfo
+          this.loading.close()
         }
       })
+    },
+    // 购买数量加减
+    numReduce () {
+      if (this.buyNum > 1) {
+        this.buyNum--
+      } else {
+        this.buyNum = 1
+      }
+    },
+    numAdd (num) {
+      if (this.buyNum < num) {
+        this.buyNum++
+      } else {
+        this.buyNum = num
+      }
     }
   }
 }
@@ -115,12 +185,18 @@ export default {
       box-sizing: border-box;
       .detail-box {
         .buy-goods {
+          width: 100%;
           height: 350px;
           margin-bottom: 30px;
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          flex-basis: 800px;
           .img-box {
+            width: 300px;
             height: 100%;
             img {
-              width: 350px;
+              width: 250px;
               height: 100%;
             }
           }
@@ -129,10 +205,36 @@ export default {
             height: 100%;
             padding: 10px;
             box-sizing: border-box;
+            width: calc(100% - 250px);
+            flex-direction: column;
+            justify-content: space-between;
+            .btn {
+              div {
+                padding: 8px 30px;
+                margin-right: 10px;
+                background-color: #ffe4d0;
+                font-size: 16px;
+                font-weight: bold;
+                color: #ff4400;
+                cursor: pointer;
+                &.add-car {
+                  background-color: #ff4400;
+                  color: #fff;
+                }
+              }
+            }
             div {
               margin-bottom: 10px;
               vertical-align: middle;
               &.buy-num {
+                // 禁止浏览器选中文字
+                moz-user-select: -moz-none;
+                -moz-user-select: none;
+                -o-user-select: none;
+                -khtml-user-select: none;
+                -webkit-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
                 p {
                   border: 1px solid #dcdfe6;
                   border-radius: 5px;
@@ -195,6 +297,46 @@ export default {
       box-sizing: border-box;
       background-color: #fff;
       width: 18%;
+      .right-goods-title {
+        margin: 0;
+        padding: 0 0 5px 5px;
+        border-bottom: 1px solid #e0e0e0;
+        color: #333;
+        font-size: 16px;
+        font-weight: 300;
+        line-height: 20px;
+      }
+      .right-goods-list {
+        width: 100%;
+        padding: 5px;
+        box-sizing: border-box;
+        font-size: 12px;
+        margin-bottom: 5px;
+        .img-boxr {
+          padding: 5px;
+          margin: 0 5px;
+          box-sizing: border-box;
+          border: 1px solid #ebebeb;
+          img {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+          }
+        }
+        .text-box {
+          line-height: 20px;
+          p {
+            color: #333;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2; //需要控制的文本行数
+            overflow: hidden;
+          }
+          span {
+            color: #999;
+          }
+        }
+      }
     }
   }
 }

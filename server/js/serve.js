@@ -79,9 +79,13 @@ exports.getGoodsDetailSes = (req, res) => {
       }
       let sqlImg = `select * from imgList where article_id = ${req.query.artid}`
       db.base(sqlImg, {}, back => {
-        console.log(back)
         obj.data.imgList = back
-        res.end(JSON.stringify(obj))
+        let rightListSql = `select * from minegoodslist `
+        // 详情右边的商品列表
+        db.base(rightListSql, {}, resList => {
+          obj.data.rightList = resList
+          res.end(JSON.stringify(obj))
+        })
       })
     }
   })

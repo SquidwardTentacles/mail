@@ -39,7 +39,7 @@
 </template>
 <script>
 export default {
-  props: ['magnifierImgArr', 'goodsBoxWidth'],
+  props: ['magnifierImgArr', 'goodsBoxWidth', 'reload'],
   /*
     magnifierImgArr
     传入的图片对象集合 数据格式 :
@@ -55,6 +55,13 @@ export default {
       // goodsBoxWidth
       // 设置放大的图片盒子的宽度 尽量沾满商品图片的右边部分
   */
+  watch: {
+    reload () {
+      if (this.reload === 1) {
+        this.imgIndex = 0
+      }
+    }
+  },
   data () {
     return {
       // magnifierImgArr: {
@@ -152,8 +159,7 @@ export default {
 </script>
 <style lang="less" scoped>
 .magnifier {
-  width: 100%;
-  height: 100%;
+  min-width: 270px;
   padding: 10px;
   box-sizing: border-box;
   .outer-box {
