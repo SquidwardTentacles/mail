@@ -1,29 +1,24 @@
 <template>
   <div class="magnifier">
-    <div class="outer-box"
-         id='outerBox'>
+    <div class="outer-box">
       <!-- 放大图片 -->
       <div class="magnifier-box"
            v-show="elemenImgShow"
-           id="thumbnailBox">
+           ref="thumbnailBox">
         <div class="inner-box">
-          <img id="thumbnailImg"
+          <img ref="thumbnailImg"
                :src="magnifierImgArr.magnifier[imgIndex].src"
                alt="">
         </div>
       </div>
       <!-- 展示的图片 -->
       <div class="img-show"
-           id="imgShowBox">
-        <!-- 发大镜图片 -->
-        <img src="../assets/img/magnifier.png"
+           ref="imgShowBox">
+        <div class="magnifier-img"
              v-show="elemenImgShow"
-             alt=""
-             class="magnifier-img"
-             id="magnifierImg">
+             ref="magnifierImg"></div>
         <img :src="magnifierImgArr.showImg[imgIndex].src"
-             alt=""
-             id="showGoodsImg">
+             alt="">
         <div class="transparent"
              @mousemove="magnifiermove($event)"
              @mouseleave="elemenImgShow = false"></div>
@@ -44,64 +39,43 @@
 </template>
 <script>
 export default {
-  props: ['magnifierImgArr'],
+  props: ['magnifierImgArr', 'goodsBoxWidth'],
+  /*
+    magnifierImgArr
+    传入的图片对象集合 数据格式 :
+      magnifierImgArr: {
+          //缩略图图片数组
+         thumbnail: [{src: ''}],
+          //要放大的图片数组
+         showImg: [{src:''}]
+          //放大的图片数组
+         magnifier: [{src:''}]
+       },
+      // 其中缩略图图片数组可以不传 如果不传将自动使用 要放大的图片数组 的数据
+      // goodsBoxWidth
+      // 设置放大的图片盒子的宽度 尽量沾满商品图片的右边部分
+  */
   data () {
     return {
       // magnifierImgArr: {
       //   // 缩略图图片数组
-      //   thumbnail: [
-      //     {
-      //       src: require('../assets/img/letter-img/22628333-1_x_2.jpg')
-      //     },
-      //     {
-      //       src: require('../assets/img/letter-img/22628333-2_x_2.jpg')
-      //     },
-      //     {
-      //       src: require('../assets/img/letter-img/22628333-3_x_2.jpg')
-      //     },
-      //     {
-      //       src: require('../assets/img/letter-img/22628333-4_x_2.jpg')
-      //     },
-      //     {
-      //       src: require('../assets/img/letter-img/22628333-5_x_2.jpg')
-      //     }
-      //   ],
+      //   thumbnail: [{src: require('../assets/img/letter-img/22628333-1_x_2.jpg')},
+      //     {src: require('../assets/img/letter-img/22628333-2_x_2.jpg')},
+      //     {src: require('../assets/img/letter-img/22628333-3_x_2.jpg')},
+      //     {src: require('../assets/img/letter-img/22628333-4_x_2.jpg')},
+      //     {src: require('../assets/img/letter-img/22628333-5_x_2.jpg')}],
       //   // 要放大的图片数组
-      //   showImg: [
-      //     {
-      //       src: require('../assets/img/center/22628333-1_w_2.jpg')
-      //     },
-      //     {
-      //       src: require('../assets/img/center/22628333-2_w_2.jpg')
-      //     },
-      //     {
-      //       src: require('../assets/img/center/22628333-3_w_2.jpg')
-      //     },
-      //     {
-      //       src: require('../assets/img/center/22628333-4_w_2.jpg')
-      //     },
-      //     {
-      //       src: require('../assets/img/center/22628333-5_w_2.jpg')
-      //     }
-      //   ],
+      //   showImg: [{src: require('../assets/img/center/22628333-1_w_2.jpg')},
+      //     {src: require('../assets/img/center/22628333-2_w_2.jpg')},
+      //     {src: require('../assets/img/center/22628333-3_w_2.jpg')},
+      //     {src: require('../assets/img/center/22628333-4_w_2.jpg')},
+      //     {src: require('../assets/img/center/22628333-5_w_2.jpg')}],
       //   // 放大的图片数组
-      //   magnifier: [
-      //     {
-      //       src: require('../assets/img/big/22628333-1_u_2.jpg')
-      //     },
-      //     {
-      //       src: require('../assets/img/big/22628333-2_u_2.jpg')
-      //     },
-      //     {
-      //       src: require('../assets/img/big/22628333-3_u_2.jpg')
-      //     },
-      //     {
-      //       src: require('../assets/img/big/22628333-4_u_2.jpg')
-      //     },
-      //     {
-      //       src: require('../assets/img/big/22628333-5_u_2.jpg')
-      //     }
-      //   ]
+      //   magnifier: [{src: require('../assets/img/big/22628333-1_u_2.jpg')},
+      //     {src: require('../assets/img/big/22628333-2_u_2.jpg')},
+      //     {src: require('../assets/img/big/22628333-3_u_2.jpg')},
+      //     {src: require('../assets/img/big/22628333-4_u_2.jpg')},
+      //     {src: require('../assets/img/big/22628333-5_u_2.jpg')} ]
       // },
       imgIndex: 0,
       elemenImgShow: false
@@ -126,23 +100,28 @@ export default {
     },
     initData () {
       // 将放大盒子向右移动
-      let outerBoxWidth = parseInt(document.getElementById('imgShowBox').offsetWidth)
+      let outerBoxWidth = parseInt(this.$refs.imgShowBox.offsetWidth)
       // 放大镜盒子
-      let thumbnailBox = document.getElementById('thumbnailBox')
+      let thumbnailBox = this.$refs.thumbnailBox
       thumbnailBox.style.left = (outerBoxWidth + 15) + 'px'
-      // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      // 设置放大盒子的宽度
+      if (this.goodsBoxWidth && this.goodsBoxWidth > 500) {
+        thumbnailBox.style.width = this.goodsBoxWidth - outerBoxWidth - 75 + 'px'
+      } else {
+        thumbnailBox.width = 500
+      }
     },
     magnifiermove (e) {
       // 有鼠标事件才加载大图片的位移 以解决在数据未加载之前就赋值了错误的位移
       this.initData()
       // 鼠标移入展示图片
       this.elemenImgShow = true
-      // console.log(e.offsetX)
-      let magnifierEle = document.getElementById('magnifierImg')
-      // 商品图片大盒子的宽高
-      let outerBoxHeight = parseInt(document.getElementById('imgShowBox').offsetHeight)
-      let outerBoxWidth = parseInt(document.getElementById('imgShowBox').offsetWidth)
-      //  放大镜图片的宽高
+      // 鼠标下移动的半透明方块
+      let magnifierEle = this.$refs.magnifierImg
+      // 待放大的图片盒子宽高
+      let outerBoxHeight = parseInt(this.$refs.imgShowBox.offsetHeight)
+      let outerBoxWidth = parseInt(this.$refs.imgShowBox.offsetWidth)
+      //  半透明方块的宽高
       let magnifierHeight = parseInt(magnifierEle.offsetHeight)
       let magnifierWidth = parseInt(magnifierEle.offsetWidth)
       // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -151,7 +130,7 @@ export default {
       let top = e.offsetY - (magnifierHeight / 2)
       // 左边临界点
       left = left < 0 ? 0 : left
-      //  右边临界点
+      //  右边临界点 透明方块可以移动的距离只有盛放商品展示图片盒子的宽度减去半透明盒子的宽度 如果移动的距离大于这个宽度 就将可移动距离设置为最大宽度 否则为鼠标移动的距离 top值同理
       left = left > outerBoxWidth - magnifierWidth ? outerBoxWidth - magnifierWidth : left
       magnifierEle.style.left = left + 'px'
       // 上面临界点
@@ -160,13 +139,11 @@ export default {
       top = top > outerBoxHeight - magnifierHeight ? outerBoxHeight - magnifierHeight : top
       magnifierEle.style.top = top + 'px'
       // 放大的图片位移通过使用margin改变图片的位置 使用比例换算出移动的距离
-      let thumbnailImgEle = document.getElementById('thumbnailImg')
-      // let showGoodsImgEle = document.getElementById('showGoodsImg')
-      let leftScale = parseFloat((thumbnailImgEle.offsetWidth / (outerBoxWidth - magnifierWidth)).toFixed(2))
-      let topScale = parseFloat((thumbnailImgEle.offsetHeight / (outerBoxHeight - magnifierHeight)).toFixed(2))
-      // let leftScale = parseFloat((thumbnailImgEle.offsetWidth / (showGoodsImgEle.offsetWidth - magnifierWidth)).toFixed(2))
-      // let topScale = parseFloat((thumbnailImgEle.offsetHeight / (showGoodsImgEle.offsetHeight - magnifierHeight)).toFixed(2))
-
+      // 获取到需要放大的图片元素
+      let thumbnailImgEle = this.$refs.thumbnailImg
+      // 换算出小图片对大图片的比例
+      let leftScale = parseFloat((thumbnailImgEle.offsetWidth / (magnifierWidth / 2.5)).toFixed(2))
+      let topScale = parseFloat((thumbnailImgEle.offsetHeight / ((magnifierHeight / 2.5))).toFixed(2))
       thumbnailImgEle.style.marginLeft = '-' + (leftScale * left) + 'px'
       thumbnailImgEle.style.marginTop = '-' + (topScale * top) + 'px'
     }
@@ -189,6 +166,9 @@ export default {
       height: calc(100% - 80px);
       position: relative;
       .magnifier-img {
+        width: 200px;
+        height: 200px;
+        background: rgba(160, 203, 236, 0.5);
         position: absolute;
         top: 0;
         left: 0;

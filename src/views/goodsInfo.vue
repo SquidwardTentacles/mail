@@ -4,13 +4,15 @@
       <router-link to="/">购物商城</router-link> > 商品详情
     </p>
     <div class="flexbox between outer-box width">
-      <div class="left-box">
+      <div class="left-box"
+           ref="leftBox">
         <div class="detail-box">
           <!-- <magnifier :imgList="imgList"></magnifier> -->
           <div class="buy-goods flexbox between">
             <div class="img-box"
                  v-if="show">
-              <sefMagnifier :magnifierImgArr="imgList"></sefMagnifier>
+              <sefMagnifier :goodsBoxWidth="goodsBoxWidth"
+                            :magnifierImgArr="imgList"></sefMagnifier>
             </div>
             <div class="right-detail-message">
               <div class="title">
@@ -40,7 +42,7 @@
         </div>
       </div>
       <div class="right-box">
-        aaaaa
+        <p class="">推荐商品</p>
       </div>
     </div>
 
@@ -62,10 +64,13 @@ export default {
         magnifier: [],
         requestOk: false
       },
-      show: false
+      show: false,
+      goodsBoxWidth: ''
     }
   },
   mounted () {
+    // 获取到商品展示区域盒子的宽高
+    this.goodsBoxWidth = this.$refs.leftBox.offsetWidth
     this.initData()
   },
   methods: {
@@ -74,10 +79,6 @@ export default {
         if (res.errcode === 0) {
           this.goodsDataArr = res.data.goodsInfo
           let imgList = res.data.imgList
-          console.log(this.imgList)
-
-          // this.images.thumbs[0].url = imgList[0].original_path
-          // this.images.thumbs[1].url = imgList[0].thumb_path
           imgList.map((cur, index) => {
             let obj = {
               id: index,
@@ -90,10 +91,6 @@ export default {
             }
             this.imgList.magnifier.push(largeUrl)
           })
-          // console.log(this.images)
-
-          // this.images.large_size[0].url = imgList[2].original_path
-          // this.images.large_size[1].url = imgList[2].thumb_path
           this.show = true
         }
       })
@@ -119,7 +116,7 @@ export default {
       .detail-box {
         .buy-goods {
           height: 350px;
-          margin-bottom: 10px;
+          margin-bottom: 30px;
           .img-box {
             height: 100%;
             img {
