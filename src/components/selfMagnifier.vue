@@ -5,7 +5,8 @@
       <div class="magnifier-box"
            v-show="elemenImgShow"
            ref="thumbnailBox">
-        <div class="inner-box">
+        <div class="inner-box"
+             ref="maginiferInnerbox">
           <img ref="thumbnailImg"
                :src="magnifierImgArr.magnifier[imgIndex].src"
                alt="">
@@ -22,17 +23,30 @@
         <div class="transparent"
              @mousemove="magnifiermove($event)"
              @mouseleave="elemenImgShow = false"></div>
+
       </div>
       <!-- 缩略图 -->
-      <div class="img-thumbnail flexbox j-start">
-        <li v-for="(item, index) in thumbnailForArr"
-            :key="index"
-            @mouseenter="thumbnailEnter(index)"
-            :class="{'active':imgIndex===index}">
-          <img :src="item.src"
-               alt=""
-               srcset="">
-        </li>
+      <div class="img-thumbnail flexbox between">
+        <div class="icon"
+             @click="nextPic"
+             v-if="iconShow">&lt;</div>
+        <div class="rel-box"
+             rel="ulOuterBox">
+          <ul class=""
+              ref="ulList">
+            <li v-for="(item, index) in thumbnailForArr"
+                :key="index"
+                @mouseenter="thumbnailEnter(index)"
+                :class="{'active':imgIndex===index}">
+              <img :src="item.src"
+                   alt=""
+                   srcset="">
+            </li>
+          </ul>
+        </div>
+        <div class="icon"
+             v-if="iconShow"
+             @click="previous">&gt;</div>
       </div>
     </div>
   </div>
@@ -66,26 +80,36 @@ export default {
     return {
       // magnifierImgArr: {
       //   // 缩略图图片数组
-      //   thumbnail: [{src: require('../assets/img/letter-img/22628333-1_x_2.jpg')},
-      //     {src: require('../assets/img/letter-img/22628333-2_x_2.jpg')},
-      //     {src: require('../assets/img/letter-img/22628333-3_x_2.jpg')},
-      //     {src: require('../assets/img/letter-img/22628333-4_x_2.jpg')},
-      //     {src: require('../assets/img/letter-img/22628333-5_x_2.jpg')}],
+      //   thumbnail: [
+      //     { src: require('../assets/img/letter-img/22628333-1_x_2.jpg') },
+      //     { src: require('../assets/img/letter-img/22628333-2_x_2.jpg') },
+      //     { src: require('../assets/img/letter-img/22628333-3_x_2.jpg') },
+      //     { src: require('../assets/img/letter-img/22628333-4_x_2.jpg') },
+      //     { src: require('../assets/img/letter-img/22628333-5_x_2.jpg') },
+      //     { src: require('../assets/img/letter-img/22628333-1_x_2.jpg') },
+      //     { src: require('../assets/img/letter-img/22628333-2_x_2.jpg') },
+      //     { src: require('../assets/img/letter-img/22628333-3_x_2.jpg') },
+      //     { src: require('../assets/img/letter-img/22628333-4_x_2.jpg') },
+      //     { src: require('../assets/img/letter-img/22628333-5_x_2.jpg') }
+      //   ],
       //   // 要放大的图片数组
-      //   showImg: [{src: require('../assets/img/center/22628333-1_w_2.jpg')},
-      //     {src: require('../assets/img/center/22628333-2_w_2.jpg')},
-      //     {src: require('../assets/img/center/22628333-3_w_2.jpg')},
-      //     {src: require('../assets/img/center/22628333-4_w_2.jpg')},
-      //     {src: require('../assets/img/center/22628333-5_w_2.jpg')}],
+      //   showImg: [{ src: require('../assets/img/center/22628333-1_w_2.jpg') },
+      //     { src: require('../assets/img/center/22628333-2_w_2.jpg') },
+      //     { src: require('../assets/img/center/22628333-3_w_2.jpg') },
+      //     { src: require('../assets/img/center/22628333-4_w_2.jpg') },
+      //     { src: require('../assets/img/center/22628333-5_w_2.jpg') }],
       //   // 放大的图片数组
-      //   magnifier: [{src: require('../assets/img/big/22628333-1_u_2.jpg')},
-      //     {src: require('../assets/img/big/22628333-2_u_2.jpg')},
-      //     {src: require('../assets/img/big/22628333-3_u_2.jpg')},
-      //     {src: require('../assets/img/big/22628333-4_u_2.jpg')},
-      //     {src: require('../assets/img/big/22628333-5_u_2.jpg')} ]
+      //   magnifier: [
+      //     { src: require('../assets/img/big/22628333-1_u_2.jpg') },
+      //     { src: require('../assets/img/big/22628333-2_u_2.jpg') },
+      //     { src: require('../assets/img/big/22628333-3_u_2.jpg') },
+      //     { src: require('../assets/img/big/22628333-4_u_2.jpg') },
+      //     { src: require('../assets/img/big/22628333-5_u_2.jpg') }
+      //   ]
       // },
       imgIndex: 0,
-      elemenImgShow: false
+      elemenImgShow: false,
+      leftData: 0
     }
   },
   mounted () {
@@ -97,6 +121,14 @@ export default {
         return this.magnifierImgArr.thumbnail
       } else {
         return this.magnifierImgArr.showImg
+      }
+    },
+    // 是否显示左右操作按钮
+    iconShow () {
+      if (this.thumbnailForArr.length > 5) {
+        return true
+      } else {
+        return false
       }
     }
   },
@@ -115,7 +147,7 @@ export default {
       if (this.goodsBoxWidth && this.goodsBoxWidth > 500) {
         thumbnailBox.style.width = this.goodsBoxWidth - outerBoxWidth - 75 + 'px'
       } else {
-        thumbnailBox.width = 500
+        thumbnailBox.width = 500 + 'px'
       }
     },
     magnifiermove (e) {
@@ -148,11 +180,43 @@ export default {
       // 放大的图片位移通过使用margin改变图片的位置 使用比例换算出移动的距离
       // 获取到需要放大的图片元素
       let thumbnailImgEle = this.$refs.thumbnailImg
+      let maginiferInnerboxEle = this.$refs.maginiferInnerbox
+      // 用大图片的宽高减去盛放大图片盒子的宽高就是可以移动的最大距离
+      let maxLeft = thumbnailImgEle.offsetWidth - maginiferInnerboxEle.offsetWidth
+      let maxTop = thumbnailImgEle.offsetHeight - maginiferInnerboxEle.offsetHeight
       // 换算出小图片对大图片的比例
-      let leftScale = parseFloat((thumbnailImgEle.offsetWidth / (magnifierWidth / 2.5)).toFixed(2))
-      let topScale = parseFloat((thumbnailImgEle.offsetHeight / ((magnifierHeight / 2.5))).toFixed(2))
+      // 使用大图片可移动的距离除以放大镜可以移动的距离 即小图对大图的移动比例
+      // 放大镜可移动的距离就是小图片盒子宽高减去放大镜盒子的宽高
+      let leftScale = parseFloat((maxLeft / (outerBoxWidth - magnifierWidth)).toFixed(2))
+      let topScale = parseFloat((maxTop / (outerBoxHeight - magnifierHeight)).toFixed(2))
+      // 通过动态改变大图片的margin值实现图片移动
       thumbnailImgEle.style.marginLeft = '-' + (leftScale * left) + 'px'
       thumbnailImgEle.style.marginTop = '-' + (topScale * top) + 'px'
+    },
+    // 缩略图列表箭头的点击事件
+    // 下一个
+    nextPic () {
+      this.positionDistance('next')
+    },
+    // 上一个
+    previous () {
+      this.positionDistance('prv')
+    },
+    positionDistance (nextOrPre) {
+      let ulListEle = this.$refs.ulList
+      let ulListEleWidth = ulListEle.offsetWidth
+      // 设置单次移动的距离
+      let num = ulListEleWidth / 4
+      let distance = 0
+      if (nextOrPre === 'next') {
+        // 设置可以移动的最大距离
+        let maxData = (this.thumbnailForArr.length * num) - ulListEleWidth
+        distance = this.leftData >= maxData ? maxData : this.leftData + num
+      } else {
+        distance = this.leftData > num ? this.leftData - num : 0
+      }
+      ulListEle.style.left = '-' + distance + 'px'
+      this.leftData = distance
     }
   }
 }
@@ -196,21 +260,64 @@ export default {
       }
     }
     .img-thumbnail {
+      width: 100%;
       margin-top: 10px;
       height: 54px;
-      overflow: auto;
-      li {
-        width: 50px;
-        height: 50px;
-        border: 2px solid transparent;
-        vertical-align: middle;
-        &.active {
-          border-color: #f00;
-        }
+      .icon {
+        width: 35px;
+        height: 35px;
+        line-height: 25px;
+        font-size: 14px;
         text-align: center;
-        img {
-          max-height: 100%;
-          max-width: 100%;
+        cursor: pointer;
+        padding: 5px;
+        box-sizing: border-box;
+        background-color: #f5f5f5;
+        // 禁止浏览器选中文字
+        moz-user-select: -moz-none;
+        -moz-user-select: none;
+        -o-user-select: none;
+        -khtml-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        &:hover {
+          background-color: #007acc;
+          color: #fff;
+        }
+      }
+      .rel-box {
+        width: calc(100% - 60px);
+        height: 100%;
+        position: relative;
+        overflow: auto;
+        // 隐藏滚动条
+        &::-webkit-scrollbar {
+          display: none;
+        }
+        ul {
+          position: absolute;
+          left: 0;
+          z-index: 100;
+          top: 0;
+          width: 100%;
+          white-space: nowrap;
+          li {
+            width: calc(100% / 4);
+            display: inline-block;
+            height: 50px;
+            border: 2px solid transparent;
+            vertical-align: middle;
+            box-sizing: border-box;
+            &.active {
+              border-color: #f00;
+            }
+            text-align: center;
+            img {
+              width: calc(100%);
+              height: calc(100%);
+            }
+          }
         }
       }
     }

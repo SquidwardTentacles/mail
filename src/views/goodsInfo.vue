@@ -11,6 +11,7 @@
           <div class="buy-goods">
             <div class="img-box"
                  v-if="show">
+              <!-- <sefMagnifier></sefMagnifier> -->
               <sefMagnifier :goodsBoxWidth="goodsBoxWidth"
                             :magnifierImgArr="imgList"
                             :reload="reload"></sefMagnifier>
