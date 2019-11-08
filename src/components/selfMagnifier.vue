@@ -28,7 +28,7 @@
       <!-- 缩略图 -->
       <div class="img-thumbnail flexbox between">
         <div class="icon"
-             @click="nextPic"
+             @click="positionDistance('next')"
              v-if="iconShow">&lt;</div>
         <div class="rel-box"
              rel="ulOuterBox">
@@ -46,7 +46,7 @@
         </div>
         <div class="icon"
              v-if="iconShow"
-             @click="previous">&gt;</div>
+             @click="positionDistance('prv')">&gt;</div>
       </div>
     </div>
   </div>
@@ -194,14 +194,6 @@ export default {
       thumbnailImgEle.style.marginTop = '-' + (topScale * top) + 'px'
     },
     // 缩略图列表箭头的点击事件
-    // 下一个
-    nextPic () {
-      this.positionDistance('next')
-    },
-    // 上一个
-    previous () {
-      this.positionDistance('prv')
-    },
     positionDistance (nextOrPre) {
       let ulListEle = this.$refs.ulList
       let ulListEleWidth = ulListEle.offsetWidth
