@@ -96,7 +96,9 @@
 </template>
 
 <script>
+import pathMix from '../assets/js/mixin/path'
 export default {
+  mixins: [pathMix],
   name: 'home',
   data () {
     return {
@@ -130,6 +132,7 @@ export default {
         this.bannerCategory = res.data.categoryData
         // 轮播图图片数据
         this.bannerImgArr = res.data.bannerData
+        this.rightBoxArr = []
         for (let i = 0; i < 4; i++) {
           this.rightBoxArr.push(this.bannerImgArr[i])
         }

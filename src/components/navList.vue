@@ -1,40 +1,54 @@
 <template>
-  <div class="navList">
-    <div class="bg">
-      <div class="inner-box flexbox between">
-        <div class="left-title">
-          商城
+  <div>
+    <div class="navList">
+      <div class="bg">
+        <div class="inner-box flexbox between">
+          <div class="left-title">
+            商城
+          </div>
+          <div class="function-list">
+            <ul class="flexbox j-end">
+              <li class="search-box">
+                <input type="text"
+                       placeholder="请输入关键字">
+                <i class="el-icon-search"></i>
+              </li>
+              <li class="search-box">
+                <span>会员中心</span>
+                <i class="border"></i>
+              </li>
+              <li class="search-box">
+                <span>推出</span>
+                <i class="border"></i>
+              </li>
+              <li class="search-box"
+                  @click="carClick">
+                <span>购物车</span>
+              </li>
+            </ul>
+          </div>
         </div>
-        <div class="function-list">
-          <ul class="flexbox j-end">
-            <li class="search-box">
-              <input type="text"
-                     placeholder="请输入关键字">
-              <i class="el-icon-search"></i>
-            </li>
-            <li class="search-box">
-              <span>会员中心</span>
-              <i class="border"></i>
-            </li>
-            <li class="search-box">
-              <span>推出</span>
-              <i class="border"></i>
-            </li>
-            <li class="search-box">
-              <span>购物车</span>
-            </li>
-          </ul>
+      </div>
+      <div class="top-nav width">
+        <!-- 导航栏 -->
+        <div class="sub-box flexbox between">
+          <li v-for="(item, index) in navData"
+              :key="index"
+              :class="{'active':navActiveId===index}">
+            <router-link :to="item.router"> {{item.label}}</router-link>
+          </li>
         </div>
       </div>
     </div>
-    <div class="top-nav width">
-      <!-- 导航栏 -->
-      <div class="sub-box flexbox between">
-        <li v-for="(item, index) in navData"
-            :key="index"
-            :class="{'active':navActiveId===index}">
-          {{item.label}}
-        </li>
+    <div class="outer-path">
+      <div class="path-detail width">当前位置：
+        <p>
+          <router-link to="/">首页 > </router-link>
+        </p>
+        <p>
+          <router-link v-if="pathObj.name"
+                       :to="pathObj.path"> {{pathObj.name}}</router-link>
+        </p>
       </div>
     </div>
   </div>
@@ -49,14 +63,33 @@ export default {
   data () {
     return {
       navData: [
-        { label: '首页' },
-        { label: '每日精选' },
-        { label: '秒杀专区' },
-        { label: '商品超市' },
-        { label: '会员权益' },
-        { label: '购物商城' }
+        { label: '首页', router: '/' },
+        { label: '每日精选', router: '/' },
+        { label: '秒杀专区', router: '/' },
+        { label: '商品超市', router: '/' },
+        { label: '会员权益', router: '/' },
+        { label: '购物商城', router: '/' }
       ],
-      navActiveId: 0
+      navActiveId: 0,
+      pathObj: {
+        name: '',
+        path: ''
+      }
+    }
+  },
+  watch: {
+    $route (to, from) {
+      console.log(to, from)
+      this.pathObj.name = to.name
+      this.pathObj.path = to.path
+    }
+  },
+
+  methods: {
+    carClick () {
+      this.$router.push({
+        path: '/buyCar'
+      })
     }
   }
 }
@@ -64,6 +97,22 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="less">
+.outer-path {
+  background-color: #f5f5f5;
+  .path-detail {
+    text-align: left;
+    font-size: 14px;
+    padding: 20px 0 10px 0;
+    p {
+      display: inline-block;
+      a {
+        display: inline-block;
+        width: 100%;
+        height: 100%;
+      }
+    }
+  }
+}
 .navList {
   width: 100%;
   .bg {
@@ -84,6 +133,7 @@ export default {
           margin: 0 3px 0 8px;
         }
         &.search-box {
+          cursor: pointer;
           margin-right: 15px;
           input {
             background: none;
@@ -115,7 +165,12 @@ export default {
         margin-right: 5px;
         cursor: pointer;
         &.active {
-          color: #008000;
+          a {
+            color: #008000;
+          }
+        }
+        a {
+          color: #fff;
         }
       }
     }

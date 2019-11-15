@@ -1,4 +1,5 @@
 import Vue from 'vue'
+
 import VueRouter from 'vue-router'
 
 Vue.use(VueRouter)
@@ -11,13 +12,18 @@ const routes = [
     children: [
       {
         path: '/',
-        name: 'goodslist',
+        name: '购物商城',
         component: () => import('../views/goodsList.vue')
       },
       {
         path: '/goodsInfo',
-        name: 'goodsInfo',
+        name: '商品详情',
         component: () => import('../views/goodsInfo.vue')
+      },
+      {
+        path: '/buyCar',
+        name: '购物车',
+        component: () => import('../views/buyCar.vue')
       }
     ]
   }

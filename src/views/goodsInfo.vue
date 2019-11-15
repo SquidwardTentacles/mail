@@ -1,17 +1,15 @@
 <template>
   <div class="goods-info">
-    <p class="path-detail width">当前位置：<router-link to="/">首页 > </router-link>
+    <!-- <p class="path-detail width">当前位置：<router-link to="/">首页 > </router-link>
       <router-link to="/">购物商城</router-link> > 商品详情
-    </p>
+    </p> -->
     <div class="flexbox between outer-box width">
       <div class="left-box"
            ref="leftBox">
         <div class="detail-box">
-          <!-- <magnifier :imgList="imgList"></magnifier> -->
           <div class="buy-goods">
             <div class="img-box"
                  v-if="show">
-              <!-- <sefMagnifier></sefMagnifier> -->
               <sefMagnifier :goodsBoxWidth="goodsBoxWidth"
                             :magnifierImgArr="imgList"
                             :reload="reload"></sefMagnifier>
@@ -82,11 +80,11 @@
   </div>
 </template>
 <script>
-// import magnifier from '../components/magnifier'
 import sefMagnifier from '../components/selfMagnifier'
+import pathMixins from '../assets/js/mixin/path'
 export default {
+  mixins: [pathMixins],
   components: {
-    // magnifier,
     sefMagnifier
   },
   data () {
@@ -172,11 +170,7 @@ export default {
 <style lang="less" scoped>
 .goods-info {
   background-color: #f5f5f5;
-  .path-detail {
-    text-align: left;
-    font-size: 14px;
-    padding: 20px 0 10px 0;
-  }
+
   .outer-box {
     align-items: flex-start;
     .left-box {

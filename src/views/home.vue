@@ -1,5 +1,5 @@
 <template>
-  <div class="">
+  <div class="home">
     <navList />
     <router-view></router-view>
   </div>
@@ -24,4 +24,7 @@ export default {
 }
 </script>
 <style lang="less" scoped>
+.home {
+  height: 100%;
+}
 </style>
