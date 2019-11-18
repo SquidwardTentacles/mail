@@ -14,16 +14,19 @@
                 <i class="el-icon-search"></i>
               </li>
               <li class="search-box">
-                <span>会员中心</span>
+                <router-link to="/login">
+                  <span>登录</span>
+                  <i class="border"></i>
+                </router-link>
+              </li>
+              <li class="search-box">
+                <span>注册</span>
                 <i class="border"></i>
               </li>
               <li class="search-box">
-                <span>推出</span>
-                <i class="border"></i>
-              </li>
-              <li class="search-box"
-                  @click="carClick">
-                <span>购物车</span>
+                <router-link to="/buyCar">
+                  <span>购物车</span>
+                </router-link>
               </li>
             </ul>
           </div>
@@ -79,18 +82,12 @@ export default {
   },
   watch: {
     $route (to, from) {
-      console.log(to, from)
       this.pathObj.name = to.name
       this.pathObj.path = to.path
     }
   },
 
   methods: {
-    carClick () {
-      this.$router.push({
-        path: '/buyCar'
-      })
-    }
   }
 }
 </script>
@@ -115,6 +112,9 @@ export default {
 }
 .navList {
   width: 100%;
+  a {
+    color: #fff;
+  }
   .bg {
     background-color: #333333;
 

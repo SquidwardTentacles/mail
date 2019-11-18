@@ -24,6 +24,11 @@ const routes = [
         path: '/buyCar',
         name: '购物车',
         component: () => import('../views/buyCar.vue')
+      },
+      {
+        path: '/login',
+        name: '登录/注册',
+        component: () => import('../views/login.vue')
       }
     ]
   }
