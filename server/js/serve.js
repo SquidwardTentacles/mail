@@ -43,6 +43,7 @@ let ifInsert = (selectData, insertData, res) => {
               errCode: 0,
               message: '新增成功'
             }
+            console.log('sus')
             res.end(JSON.stringify(backobj))
           } else {
             backobj = {
@@ -52,14 +53,21 @@ let ifInsert = (selectData, insertData, res) => {
             res.end(JSON.stringify(backobj))
           }
         })
+      } else {
+        // 如果是登录没有查询到数据就是未注册
+        backobj = {
+          errCode: 1,
+          message: '账号未注册'
+        }
+        res.end(JSON.stringify(backobj))
       }
     } else {
       backobj = {
         errCode: insertData.register,
         message: insertData.register === 1 ? '数据已经存在' : '登录成功！'
       }
+      res.end(JSON.stringify(backobj))
     }
-    res.end(JSON.stringify(backobj))
   })
 }
 exports.getBanner = (req, res) => {

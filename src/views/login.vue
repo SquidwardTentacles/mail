@@ -91,6 +91,14 @@ export default {
   mounted () {
 
   },
+  beforeRouteEnter (to, from, next) {
+    // 在渲染该组件的对应路由被 confirm 前调用
+    // 不！能！获取组件实例 `this`
+    // 因为当钩子执行前，组件实例还没被创建
+    console.log(from)
+    sessionStorage.setItem('loginFromPath', from.path)
+    next()
+  },
   methods: {
     submitForm (formName) {
       this.$refs[formName].validate((valid) => {
@@ -104,6 +112,19 @@ export default {
           this.axios.post('/register', params).then(res => {
             if (res.errCode === 0) {
               this.$message.success(res.message)
+              // 如果注册成功了就自动登录
+              if (this.loginFunc === 1) {
+                this.loginFunc = 0
+                this.submitForm('ruleForm')
+              } else {
+                // 存储用户数据
+                this.$store.commit('userSesFunc', this.ruleForm)
+                let pathS = sessionStorage.getItem('loginFromPath')
+                pathS = pathS || '/'
+                this.$router.push({
+                  path: pathS
+                })
+              }
             } else {
               this.$message.error(res.message)
             }

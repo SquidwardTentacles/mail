@@ -6,7 +6,11 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     buyCar: [],
-    currentPathArr: []
+    currentPathArr: [],
+    userSes: {
+      userName: '',
+      passWord: ''
+    }
   },
   mutations: {
     buyCarFunc (state, data) {
@@ -17,6 +21,9 @@ export default new Vuex.Store({
     },
     currentPathArrFunc (state, data) {
       state.currentPathArr = data
+    },
+    userSesFunc (state, data) {
+      state.userSes = data
     }
   },
   actions: {},

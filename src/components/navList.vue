@@ -13,15 +13,33 @@
                        placeholder="请输入关键字">
                 <i class="el-icon-search"></i>
               </li>
-              <li class="search-box">
+              <li class="search-box"
+                  v-if="noLogin">
                 <router-link to="/login">
                   <span>登录</span>
                   <i class="border"></i>
                 </router-link>
               </li>
-              <li class="search-box">
-                <span>注册</span>
+              <li class="search-box"
+                  v-if="noLogin">
+                <router-link to="/login">
+                  <span>注册</span>
+                  <i class="border"></i>
+                </router-link>
+              </li>
+              <li class="search-box user-ses-box"
+                  @mouseenter="outShow=1"
+                  @mouseleave="outShow=0"
+                  v-else>
+                <span>{{this.$store.state.userSes.userName}}</span>
                 <i class="border"></i>
+                <div class="login-out">
+                  <div v-if="outShow">
+                    <div class="inner">
+                      <p @click="loginOutClick">退出登录</p>
+                    </div>
+                  </div>
+                </div>
               </li>
               <li class="search-box">
                 <router-link to="/buyCar">
@@ -77,7 +95,8 @@ export default {
       pathObj: {
         name: '',
         path: ''
-      }
+      },
+      outShow: 0
     }
   },
   watch: {
@@ -86,8 +105,23 @@ export default {
       this.pathObj.path = to.path
     }
   },
-
+  computed: {
+    noLogin () {
+      if (this.$store.state.userSes.userName) {
+        return false
+      } else {
+        return true
+      }
+    }
+  },
   methods: {
+    loginOutClick () {
+      let obj = {
+        userName: '',
+        passWord: ''
+      }
+      this.$store.commit('userSesFunc', obj)
+    }
   }
 }
 </script>
@@ -145,6 +179,19 @@ export default {
           i {
             cursor: pointer;
             padding: 0 5px;
+          }
+          &.user-ses-box {
+            position: relative;
+            .login-out {
+              position: absolute;
+              top: 0;
+              left: 0;
+              .inner {
+                margin-top: 20px;
+                background-color: #fff;
+                color: #000;
+              }
+            }
           }
         }
       }
