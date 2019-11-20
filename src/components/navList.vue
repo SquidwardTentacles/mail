@@ -116,11 +116,18 @@ export default {
   },
   methods: {
     loginOutClick () {
-      let obj = {
+      sessionStorage.removeItem('userSesson')
+      let userSes = {
         userName: '',
         passWord: ''
       }
-      this.$store.commit('userSesFunc', obj)
+      this.$store.commit('userSesFunc', userSes)
+      if (this.$route.path !== '/') {
+        this.$router.push({
+          path: '/'
+        })
+      }
+      this.$message.success('已退出登录')
     }
   }
 }

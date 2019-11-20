@@ -76,7 +76,8 @@
               <div class="detail-box"
                    v-for="(items, index) in item.goodsList"
                    :key="index">
-                <router-link :to="'/goodsInfo?artid='+items.artID">
+                <!-- <router-link :to="'/goodsInfo?artid='+items.artID"> -->
+                <div @click="toGoodDetail(items.artID)">
                   <img :src="items.img_url"
                        alt="">
                   <div class="introduce flexbox a-start">
@@ -84,7 +85,8 @@
                     <p><span class="price">{{items.market_price}}</span> <span>元</span></p>
                     <p class="flexbox between"><span>市场价：<del>{{items.sell_price}}</del></span> <span>库存：{{items.stock_quantity}}</span></p>
                   </div>
-                </router-link>
+                </div>
+                <!-- </router-link> -->
               </div>
             </div>
           </div>
@@ -148,6 +150,14 @@ export default {
     bannerListHover (i) {
       this.coverId = i
       this.bannerCoverShow = true
+    },
+    toGoodDetail (id) {
+      this.$router.push({
+        path: '/goodsInfo',
+        query: {
+          artid: id
+        }
+      })
     }
   }
 }

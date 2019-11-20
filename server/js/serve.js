@@ -133,6 +133,17 @@ exports.getGoodsSesson = (req, res) => {
 // 获取商品详细信息
 exports.getGoodsDetailSes = (req, res) => {
   // res.end(req.query.artid)
+  console.log(!req.query.artid, 'dd')
+
+  if (!req.query.artid || req.query.artid === 'undefined') {
+    res.end(
+      JSON.stringify({
+        errCode: 1,
+        message: '参数错误'
+      })
+    )
+    return
+  }
   let sql = `select * from goodsinfo where id = ${req.query.artid}`
   db.base(sql, {}, callback => {
     if (callback) {
@@ -159,8 +170,73 @@ exports.getGoodsDetailSes = (req, res) => {
 exports.register = (req, res) => {
   console.log(req.body)
   let selectArr = {
-    sql: `select count(*) as total from userInfo where userName = ${req.body.userName} and passWord = ${req.body.passWord}`,
+    sql: `select count(*) as total from userInfo where userName = ${req.body.userName}`,
     dataBase: 'userInfo'
   }
   ifInsert(selectArr, req.body, res)
+}
+// 保存用户购买商品
+exports.addUserGoods = (req, res) => {
+  console.log(req.body)
+
+  let objStr = JSON.stringify(req.body)
+  if (objStr === '{}') {
+    res.end(
+      JSON.stringify({
+        errCode: 1,
+        message: '参数错误'
+      })
+    )
+    return
+  }
+  let sql = `select count(*) as total from userGoodsList where userName = ${req.body.userName} and artId = ${req.body.artId}`
+  db.base(sql, {}, callback => {
+    console.log(callback)
+
+    // 当前用户没有此商品就新增
+    if (callback[0].total === 0) {
+      let insertSql = `insert into userGoodsList set ?`
+      db.base(insertSql, req.body, insertBack => {
+        if (insertBack) {
+          res.end(
+            JSON.stringify({
+              errCode: 0,
+              message: '已加入购物车'
+            })
+          )
+        } else {
+          res.end(
+            JSON.stringify({
+              errCode: 1,
+              message: '插入失败'
+            })
+          )
+        }
+      })
+    } else {
+      console.log('u')
+
+      // 如果有就更新数据
+      let updateSql = `update userGoodsList set buyNum=${req.body.buyNum} where artId = ${req.body.artId}`
+      db.base(updateSql, {}, updateBack => {
+        console.log(updateBack.affectedRows)
+
+        if (updateBack.affectedRows !== 0) {
+          res.end(
+            JSON.stringify({
+              errCode: 0,
+              message: '更新成功'
+            })
+          )
+        } else {
+          res.end(
+            JSON.stringify({
+              errCode: 1,
+              message: '更新失败'
+            })
+          )
+        }
+      })
+    }
+  })
 }

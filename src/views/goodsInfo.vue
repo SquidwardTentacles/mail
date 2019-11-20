@@ -47,7 +47,9 @@
                 <div class="buy">
                   立即购买
                 </div>
-                <div class="add-car">
+                <div class="add-car"
+                     ref="addToCar"
+                     @click="addToCar($event)">
                   加入购物车
                 </div>
               </div>
@@ -111,12 +113,12 @@ export default {
   },
   methods: {
     initData (id) {
-      this.loading = this.$loading({
-        lock: true,
-        text: 'Loading',
-        spinner: 'el-icon-loading',
-        background: 'rgba(0, 0, 0, 0.7)'
-      })
+      // this.loading = this.$loading({
+      //   lock: true,
+      //   text: 'Loading',
+      //   spinner: 'el-icon-loading',
+      //   background: 'rgba(0, 0, 0, 0.7)'
+      // })
       this.axios.get(`/getGoodsDetailSes?artid=${id}`).then(res => {
         if (res.errcode === 0) {
           this.reload = 1
@@ -145,7 +147,7 @@ export default {
           // 右边列表
           this.rightListArr = res.data.rightList
           this.goodsInfo = res.data.goodsInfo
-          this.loading.close()
+          // this.loading.close()
         }
       })
     },
@@ -162,6 +164,27 @@ export default {
         this.buyNum++
       } else {
         this.buyNum = num
+      }
+    },
+    addToCar (e) {
+      if (!this.$store.state.userSes.userName) {
+        this.$message.error('请登录后进行操作')
+        this.$router.push({
+          path: '/login'
+        })
+      } else {
+        let params = {
+          userName: this.$store.state.userSes.userName,
+          buyNum: this.buyNum,
+          artId: this.$route.query.artid
+        }
+        this.axios.post('/addUserGoods', params).then(res => {
+          if (res.errCode === 0) {
+            this.$message.success(res.message)
+          } else {
+            this.$message.error(res.message)
+          }
+        })
       }
     }
   }
@@ -215,6 +238,7 @@ export default {
                 &.add-car {
                   background-color: #ff4400;
                   color: #fff;
+                  position: relative;
                 }
               }
             }

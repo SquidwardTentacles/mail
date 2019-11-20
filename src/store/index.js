@@ -7,9 +7,15 @@ export default new Vuex.Store({
   state: {
     buyCar: [],
     currentPathArr: [],
+    // 保存用户的登录信息
     userSes: {
       userName: '',
       passWord: ''
+    },
+    // 保存进入登录页面之前的页面路由
+    fromPath: {
+      path: '/',
+      query: {}
     }
   },
   mutations: {
@@ -24,8 +30,23 @@ export default new Vuex.Store({
     },
     userSesFunc (state, data) {
       state.userSes = data
+      sessionStorage.setItem('userSesson', JSON.stringify(data))
+    },
+    fromPathFunc (state, data) {
+      state.fromPath = data
+    },
+    carPathFunc (state, data) {
+      state.carPath = data
     }
   },
   actions: {},
-  modules: {}
+  modules: {},
+  getters: {
+    userSessonG: state => {
+      let fPath = sessionStorage.getItem('userSesson')
+      if (fPath) {
+        state.userSes = JSON.parse(fPath)
+      }
+    }
+  }
 })

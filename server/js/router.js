@@ -16,7 +16,15 @@ router.get('/getGoodsDetailSes', service.getGoodsDetailSes)
     register:0/1    //0 登录 1注册
   }
 */
-
 router.post('/register', service.register)
+/**
+ * 保存用户购买的商品信息
+ * {
+ *  userName：‘用户名’，
+ *  buyNum:'购买数量',
+ *  artId:'商品id'
+ * }
+ */
+router.post('/addUserGoods', service.addUserGoods)
 
 module.exports = router
