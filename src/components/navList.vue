@@ -22,13 +22,13 @@
               </li>
               <li class="search-box"
                   v-if="noLogin">
-                <router-link to="/login">
+                <router-link to="/login?type=1">
                   <span>注册</span>
                   <i class="border"></i>
                 </router-link>
               </li>
               <li class="search-box user-ses-box"
-                  @mouseenter="outShow=1"
+                  @mouseenter="outShow = 1"
                   @mouseleave="outShow=0"
                   v-else>
                 <span>{{this.$store.state.userSes.userName}}</span>
@@ -117,11 +117,11 @@ export default {
   methods: {
     loginOutClick () {
       sessionStorage.removeItem('userSesson')
-      let userSes = {
-        userName: '',
-        passWord: ''
-      }
-      this.$store.commit('userSesFunc', userSes)
+      // let userSes = {
+      //   userName: '',
+      //   passWord: ''
+      // }
+      this.$store.commit('userSesFunc', '')
       if (this.$route.path !== '/') {
         this.$router.push({
           path: '/'
@@ -164,7 +164,7 @@ export default {
       font-size: 14px;
       color: #fff;
       padding: 10px 0;
-      width: 1200px;
+      max-width: 1200px;
       li {
         margin-right: 5px;
         i.border {

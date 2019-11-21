@@ -3,7 +3,17 @@
     <router-view />
   </div>
 </template>
-
+<script>
+export default {
+  mounted () {
+    // 检查用户信息
+    let userSes = sessionStorage.getItem('userSesson');
+    if (userSes) {
+      this.$store.commit('userSesFunc', JSON.parse(userSes))
+    }
+  }
+}
+</script>
 <style lang="less">
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
@@ -14,6 +24,7 @@
 }
 .width {
   max-width: 1100px;
+  min-width: 900px;
   margin: 0 auto;
 }
 html,
@@ -69,5 +80,15 @@ li {
 ul {
   padding: 0;
   margin: 0;
+}
+.prohibitChoose {
+  // 禁止浏览器选中文字
+  moz-user-select: -moz-none;
+  -moz-user-select: none;
+  -o-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 </style>

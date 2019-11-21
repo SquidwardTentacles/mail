@@ -19,32 +19,42 @@
           <thead>
             <tr>
               <th>选择</th>
-              <th>商品信息</th>
+              <th class="goodsSes">商品信息</th>
               <th>单价</th>
-              <th>数量</th>
+              <th>库存</th>
+              <th>购买数量</th>
               <th>金额（元）</th>
               <th>操作</th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
+          <tbody v-if="carTableSes.length">
+            <tr v-for="(item, index) in carTableSes"
+                :key="index">
               <td>
-                <el-switch v-model="value"
+                <el-switch v-model="item.choose"
                            active-color="#13ce66"
                            inactive-color="#ff4949">
                 </el-switch>
               </td>
-              <td>电脑</td>
-              <td>3000</td>
-              <td>1</td>
-              <td>3000元</td>
+              <td class="goodsSes">
+                <router-link :to="'/goodsInfo?artId='+item.artId">{{item.title}}</router-link>
+              </td>
+              <td>{{item.price}}</td>
+              <td>{{item.stock_quantity}} 件</td>
+              <td class="buy-num prohibitChoose">
+                <p class="flexbox between"><span @click="numAdd(item,index)">+</span><span>{{item.buyNum}} </span><span @click="numReduce(item,index)">-</span> </p>
+              </td>
+              <td>{{item.totalPrice}}元</td>
               <td>购买</td>
             </tr>
           </tbody>
+          <tbody v-else>
+            空空如也
+          </tbody>
         </table>
-        <div class="footer">
-          <span>已选商品：<i>1</i>件</span>
-          <span>商品总金额（不含运费）：￥7008（元）</span>
+        <div class="footer flexbox j-end">
+          <p>已选商品：<span class="choose-goods">{{chooseGoods}}</span>件</p>
+          <p>商品总金额（不含运费）：￥<span class="total-price">{{totalPrice}}</span>（元）</p>
 
         </div>
       </div>
@@ -55,14 +65,60 @@
 export default {
   data () {
     return {
-      value: ''
+      value: '',
+      carTableSes: []
     }
   },
   mounted () {
-
+    this.initData()
+  },
+  computed: {
+    totalPrice () {
+      if (this.carTableSes.length) {
+        let price = 0
+        this.carTableSes.map(curItem => {
+          price += curItem.choose ? parseInt(curItem.totalPrice * curItem.buyNum) : 0
+        })
+        return price
+      } else {
+        return 0
+      }
+    },
+    chooseGoods () {
+      if (this.carTableSes.length) {
+        let choose = 0
+        this.carTableSes.map(curItem => {
+          choose += curItem.choose ? 1 : 0
+        })
+        return choose
+      } else {
+        return 0
+      }
+    }
   },
   methods: {
-
+    initData () {
+      this.axios.get(`/getUserCar?userName=${this.$store.state.userSes.userName}`).then(res => {
+        console.log(res);
+        if (res.errCode === 0) {
+          this.carTableSes = res.message.data
+        }
+      })
+    },
+    numAdd (item, i) {
+      if (item.buyNum < parseInt(item.stock_quantity)) {
+        item.buyNum++
+      } else {
+        this.$message.error('没有库存')
+      }
+    },
+    numReduce (item) {
+      if (item.buyNum > 1) {
+        item.buyNum--
+      } else {
+        this.$message.error('不能再减了偶')
+      }
+    }
   }
 }
 </script>
@@ -118,6 +174,10 @@ export default {
         margin-top: 20px;
         width: 100%;
         background: #f5f5f5;
+        font-size: 14px;
+        .goodsSes {
+          text-align: left;
+        }
         thead {
           color: #555;
           font-size: 13px;
@@ -135,6 +195,31 @@ export default {
               border-bottom: 1px solid #f5f5f5;
               padding: 10px 0;
               box-sizing: border-box;
+              &.buy-num {
+                p {
+                  border: 1px solid #ccc;
+                  height: 20px;
+                  line-height: 20px;
+                  font-size: 14px;
+                  width: 100px;
+                  margin: 0 auto;
+                  span {
+                    vertical-align: middle;
+                    height: 100%;
+                    width: 20px;
+                    cursor: pointer;
+                    &:nth-child(1) {
+                      border-right: 1px solid #ccc;
+                    }
+                    &:nth-child(2) {
+                      width: 25px;
+                    }
+                    &:nth-last-child(1) {
+                      border-left: 1px solid #ccc;
+                    }
+                  }
+                }
+              }
             }
           }
         }
@@ -143,10 +228,21 @@ export default {
         text-align: right;
         padding: 5px;
         box-sizing: border-box;
+        p {
+          font-size: 14px;
+          margin-left: 10px;
+        }
         span {
           vertical-align: middle;
-          margin-right: 20px;
           font-size: 14px;
+          &.choose-goods {
+            margin: 0;
+            margin: 5px;
+          }
+          &.total-price {
+            color: #f00;
+            font-size: 16px;
+          }
         }
       }
     }

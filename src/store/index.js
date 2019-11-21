@@ -1,7 +1,7 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
+import Vue from 'vue';
+import Vuex from 'vuex';
 
-Vue.use(Vuex)
+Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
@@ -20,33 +20,34 @@ export default new Vuex.Store({
   },
   mutations: {
     buyCarFunc (state, data) {
-      let carData = state.buyCar
+      let carData = state.buyCar;
       if (carData.length === 0) {
-        state.buyCar.push(data)
+        state.buyCar.push(data);
       }
     },
     currentPathArrFunc (state, data) {
-      state.currentPathArr = data
+      state.currentPathArr = data;
     },
     userSesFunc (state, data) {
-      state.userSes = data
-      sessionStorage.setItem('userSesson', JSON.stringify(data))
+      state.userSes = data;
+      if (!data) return;
+      sessionStorage.setItem('userSesson', JSON.stringify(data));
     },
     fromPathFunc (state, data) {
-      state.fromPath = data
+      state.fromPath = data;
     },
     carPathFunc (state, data) {
-      state.carPath = data
+      state.carPath = data;
     }
   },
   actions: {},
   modules: {},
   getters: {
-    userSessonG: state => {
-      let fPath = sessionStorage.getItem('userSesson')
+    userSessonG (state) {
+      let fPath = sessionStorage.getItem('userSesson');
       if (fPath) {
-        state.userSes = JSON.parse(fPath)
+        state.userSes = JSON.parse(fPath);
       }
     }
   }
-})
+});

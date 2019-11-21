@@ -1,7 +1,7 @@
 <template>
   <div class="home flexbox between">
     <div class="top">
-      <navList />
+      <navList outShow="0" />
       <div class="content-box">
         <router-view></router-view>
       </div>
@@ -37,10 +37,6 @@ export default {
     }
   },
   mounted () {
-
-  },
-  methods: {
-
   }
 }
 </script>

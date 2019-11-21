@@ -32,7 +32,7 @@
                   <span class="label">销售价：</span>
                   <span class="now-price">￥4000</span>
                 </div>
-                <div class="flexbox j-start buy-num">
+                <div class="flexbox j-start buy-num prohibitChoose">
                   <span class="label">购买数量：</span>
                   <p><span class="add-icon one"
                           @click="numReduce">-</span> <span class="num">{{buyNum}}</span> <span class="add-icon two"
@@ -56,7 +56,7 @@
             </div>
           </div>
           <div v-html="goodsDataArr.content"
-               class="goods-ses-show width"></div>
+               class="goods-ses-show"></div>
         </div>
       </div>
       <div class="right-box">
@@ -109,7 +109,7 @@ export default {
   mounted () {
     // 获取到商品展示区域盒子的宽高
     this.goodsBoxWidth = this.$refs.leftBox.offsetWidth
-    this.initData(this.$route.query.artid)
+    this.initData(this.$route.query.artId)
   },
   methods: {
     initData (id) {
@@ -246,14 +246,6 @@ export default {
               margin-bottom: 10px;
               vertical-align: middle;
               &.buy-num {
-                // 禁止浏览器选中文字
-                moz-user-select: -moz-none;
-                -moz-user-select: none;
-                -o-user-select: none;
-                -khtml-user-select: none;
-                -webkit-user-select: none;
-                -ms-user-select: none;
-                user-select: none;
                 p {
                   border: 1px solid #dcdfe6;
                   border-radius: 5px;

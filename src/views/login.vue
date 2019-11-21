@@ -89,7 +89,11 @@ export default {
     }
   },
   mounted () {
-
+    if (parseInt(this.$route.query.type) === 1) {
+      this.loginFunc = 1
+    } else {
+      this.loginFunc = 0
+    }
   },
   methods: {
     submitForm (formName) {

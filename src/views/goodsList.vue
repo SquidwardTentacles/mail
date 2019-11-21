@@ -155,7 +155,7 @@ export default {
       this.$router.push({
         path: '/goodsInfo',
         query: {
-          artid: id
+          artId: id
         }
       })
     }
