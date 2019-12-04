@@ -158,40 +158,61 @@ exports.addUserGoods = (req, res) => {
   let objStr = JSON.stringify(req.body);
   if (objStr === '{}') {
     reqsBack(1, 'err', res);
-    return;
   }
+  console.log(req.body);
+
+  updateUserCar(req.body, res);
+};
+/**
+ *  更新用户购物车方法封装
+ * obj = {
+ *  artTd,
+ *  userName,
+ *  buyNum
+ * },
+ * res:res
+ * type:商品更新状态 没有传type则默认为更新 否则为删除
+ * type:update/del
+ */
+let updateUserCar = (obj, res, type) => {
   // 先查找是否有商品信息
-  let sql = `select * from userinfo where userName='${req.body.userName}'`;
+  let sql = `select * from userinfo where userName='${obj.userName}'`;
   db.base(sql, {}, callback => {
     if (!callback[0].goods_sesson) {
       let arr = [
         {
-          art_id: req.body.artId,
-          buy_num: req.body.buyNum
+          art_id: obj.artId,
+          buy_num: obj.buyNum
         }
       ];
       // 如果没有商品信息 就直接更新
-      goodsInfoUpdate(arr, req.body.userName, res);
+      goodsInfoUpdate(arr, obj.userName, res);
     } else {
       // 如果查询到了商品信息
       let goodsSesson = JSON.parse(callback[0].goods_sesson);
       let hasGoods = false;
-      goodsSesson.map(cur => {
-        if (cur.art_id === req.body.artId) {
-          // 如果有一样的商品 就更新购买数量
-          cur.buy_num = req.body.buyNum;
-          hasGoods = true;
+      goodsSesson.map((cur, index) => {
+        // 如果没有type为更新 否则为删除
+        if (cur.art_id === obj.artId) {
+          if (!type) {
+            // 如果有一样的商品 就更新购买数量
+            cur.buy_num = obj.buyNum;
+            hasGoods = true;
+          } else {
+            // 如果是删除就删除指定项
+            goodsSesson.splice(index, 1);
+          }
         }
       });
       // 如果没有找到商品就将当前商品push到数组
-      if (!hasGoods) {
+      if (!hasGoods && !type) {
         goodsSesson.push({
-          art_id: req.body.artId,
-          buy_num: req.body.buyNum
+          art_id: obj.artId,
+          buy_num: obj.buyNum
         });
       }
 
-      goodsInfoUpdate(goodsSesson, req.body.userName, res);
+      goodsInfoUpdate(goodsSesson, obj.userName, res);
     }
   });
 };
@@ -247,7 +268,20 @@ exports.getUserCar = (req, res) => {
             }
           });
         });
+      } else {
+        reqsBack(0, 'success', res, '购物车为空');
       }
+    } else {
+      reqsBack(1, 'err', res, '数据获取失败');
     }
   });
+};
+// 删除购物车商品
+exports.delectCarGoods = (req, res) => {
+  if (!req.query.artId || !req.query.userName) {
+    reqsBack(1, 'err', res);
+    return;
+  }
+  req.query.artId = parseFloat(req.query.artId);
+  updateUserCar(req.query, res, 'del');
 };

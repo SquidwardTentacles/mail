@@ -34,3 +34,9 @@ router.post('/addUserGoods', service.addUserGoods);
  */
 router.get('/getUserCar', service.getUserCar);
 module.exports = router;
+/**
+ * 删除购物车商品信息
+ * delete
+ * artId:商品id&userName:userName
+ */
+router.delete('/delectCarGoods', service.delectCarGoods);

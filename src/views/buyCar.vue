@@ -15,7 +15,7 @@
       </div>
       <div class="table-outer-box">
         <table class="table-box"
-               cellspacing='0     '>
+               cellspacing='0'>
           <thead>
             <tr>
               <th>选择</th>
@@ -27,7 +27,7 @@
               <th>操作</th>
             </tr>
           </thead>
-          <tbody v-if="carTableSes.length">
+          <tbody v-if="carTableSes||carTableSes.length">
             <tr v-for="(item, index) in carTableSes"
                 :key="index">
               <td>
@@ -45,17 +45,18 @@
                 <p class="flexbox between"><span @click="numAdd(item,index)">+</span><span>{{item.buyNum}} </span><span @click="numReduce(item,index)">-</span> </p>
               </td>
               <td>{{item.totalPrice}}元</td>
-              <td>购买</td>
+              <td><span>购买</span><span class="delect"
+                      @click="delectGoods(item.artId)">删除 </span></td>
             </tr>
           </tbody>
-          <tbody v-else>
-            空空如也
-          </tbody>
         </table>
+        <div class="none-goods"
+             v-if="!carTableSes||!carTableSes.length">
+          空空如也
+        </div>
         <div class="footer flexbox j-end">
           <p>已选商品：<span class="choose-goods">{{chooseGoods}}</span>件</p>
           <p>商品总金额（不含运费）：￥<span class="total-price">{{totalPrice}}</span>（元）</p>
-
         </div>
       </div>
     </div>
@@ -74,7 +75,7 @@ export default {
   },
   computed: {
     totalPrice () {
-      if (this.carTableSes.length) {
+      if (this.carTableSes || this.carTableSes.length) {
         let price = 0
         this.carTableSes.map(curItem => {
           price += curItem.choose ? parseInt(curItem.totalPrice * curItem.buyNum) : 0
@@ -85,7 +86,7 @@ export default {
       }
     },
     chooseGoods () {
-      if (this.carTableSes.length) {
+      if (this.carTableSes || this.carTableSes.length) {
         let choose = 0
         this.carTableSes.map(curItem => {
           choose += curItem.choose ? 1 : 0
@@ -99,9 +100,14 @@ export default {
   methods: {
     initData () {
       this.axios.get(`/getUserCar?userName=${this.$store.state.userSes.userName}`).then(res => {
-        console.log(res);
         if (res.errCode === 0) {
-          this.carTableSes = res.message.data
+          if (res.message.data) {
+            this.carTableSes = res.message.data
+          } else {
+            this.carTableSes = []
+          }
+        } else {
+          this.$message.error(res.message)
         }
       })
     },
@@ -118,6 +124,29 @@ export default {
       } else {
         this.$message.error('不能再减了偶')
       }
+    },
+    // 删除商品
+    delectGoods (id) {
+      this.$confirm('确认删除商品？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消'
+      })
+        .then(() => {
+          if (id) {
+            this.axios.delete(`/delectCarGoods?artId=${id}&userName=${this.$store.state.userSes.userName}`).then(res => {
+              if (res.errCode === 0) {
+                this.$message.success(res.message)
+                this.initData()
+              } else {
+                this.$message.error(res.message)
+              }
+            })
+          }
+        })
+        .catch(res => {
+          // this.errtipMessage()
+          console.log(res)
+        })
     }
   }
 }
@@ -170,6 +199,14 @@ export default {
       padding: 3px;
       padding-top: 0;
       box-sizing: border-box;
+      .none-goods {
+        width: 100%;
+        display: block;
+        background: none;
+        text-align: center;
+        font-size: 12px;
+        padding: 10px;
+      }
       .table-box {
         margin-top: 20px;
         width: 100%;
@@ -190,11 +227,19 @@ export default {
         tbody {
           text-align: center;
           background-color: #fff;
+
           tr {
             td {
               border-bottom: 1px solid #f5f5f5;
               padding: 10px 0;
               box-sizing: border-box;
+              .delect {
+                margin-left: 10px;
+                cursor: pointer;
+                &:hover {
+                  color: #f00;
+                }
+              }
               &.buy-num {
                 p {
                   border: 1px solid #ccc;

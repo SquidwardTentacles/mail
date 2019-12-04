@@ -37,18 +37,11 @@ export default {
     }
   },
   mounted () {
-    // function factorial (n) {
-    //   // debugger
-    //   if (n === 1) return 1
-    //   return n * factorial(n - 1)
-    // }
-    // console.log(factorial(3));
     function factorial2 (n, total) {
-      debugger
       if (n === 1) return total
       return factorial2(n - 1, n * total)
     }
-    console.log(factorial2(3, 1));
+    factorial2(3, 1)
   }
 }
 </script>
