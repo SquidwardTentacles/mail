@@ -237,6 +237,8 @@ exports.getUserCar = (req, res) => {
       reqsBack(0, 'err', res);
       return;
     }
+    console.log(selBack[0].goods_sesson);
+
     if (selBack[0].goods_sesson) {
       let arr = JSON.parse(selBack[0].goods_sesson);
       if (arr.length) {
@@ -272,7 +274,12 @@ exports.getUserCar = (req, res) => {
         reqsBack(0, 'success', res, '购物车为空');
       }
     } else {
-      reqsBack(1, 'err', res, '数据获取失败');
+      reqsBack(
+        1,
+        'err',
+        res,
+        selBack[0].goods_sesson === 'null' ? '购物车为空' : '数据获取失败'
+      );
     }
   });
 };

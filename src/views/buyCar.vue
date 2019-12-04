@@ -144,7 +144,6 @@ export default {
           }
         })
         .catch(res => {
-          // this.errtipMessage()
           console.log(res)
         })
     }
