@@ -176,7 +176,7 @@ export default {
         let params = {
           userName: this.$store.state.userSes.userName,
           buyNum: this.buyNum,
-          artId: this.$route.query.artid
+          artId: this.$route.query.artId
         }
         this.axios.post('/addUserGoods', params).then(res => {
           if (res.errCode === 0) {

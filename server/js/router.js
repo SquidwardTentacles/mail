@@ -27,7 +27,7 @@ router.post('/register', service.register);
  */
 router.post('/addUserGoods', service.addUserGoods);
 /**
- * 获取当把用户下的购物车信息
+ * 获取当前用户下的购物车信息
  * {
  *  userName:userName
  * }

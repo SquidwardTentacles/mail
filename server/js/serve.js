@@ -4,28 +4,39 @@ let backData = {
   data: {}
 };
 /**
- * 封装返回数据
- * errCode 错误编码 message 错误信息 res res
+ * 封装返回数据的公共方法
+ * errCode 错误编码 message 错误信息 res res backMes 自定义返回信息 不传使用默认值
  */
-let reqsBack = (errCode, message, res) => {
-  res.end(
-    JSON.stringify({
-      errCode,
-      message
-    })
-  );
+let reqsBack = (errCode, message, res, backMes) => {
+  if (message === 'err') {
+    res.end(
+      JSON.stringify({
+        errCode: 1,
+        message: backMes || '请求失败！请稍后重试'
+      })
+    );
+  } else if (message === 'success') {
+    res.end(
+      JSON.stringify({
+        errCode: 0,
+        message: backMes || '操作成功'
+      })
+    );
+  } else {
+    res.end(
+      JSON.stringify({
+        errCode,
+        message
+      })
+    );
+  }
 };
 exports.getBanner = (req, res) => {
-  console.log('getBanner');
-
   let sql = 'select * from navgoodscategory';
   let categoryData = {};
   db.base(sql, {}, callback => {
-    // console.log(callback)
     if (callback && callback.length > 0) {
       categoryData = callback;
-      // console.log(categoryData)
-
       categoryData.map((curr, i) => {
         let sqlData = `select * from navgoodslist where ?`;
         let data = { pid: curr.id };
@@ -144,95 +155,99 @@ exports.register = (req, res) => {
 };
 // 保存用户购买商品
 exports.addUserGoods = (req, res) => {
-  console.log(req.body);
-
   let objStr = JSON.stringify(req.body);
   if (objStr === '{}') {
-    res.end(
-      JSON.stringify({
-        errCode: 1,
-        message: '参数错误'
-      })
-    );
+    reqsBack(1, 'err', res);
     return;
   }
-  let sql = `select count(*) as total from userGoodsList where userName = '${req.body.userName} 'and artId = '${req.body.artId}'`;
+  // 先查找是否有商品信息
+  let sql = `select * from userinfo where userName='${req.body.userName}'`;
   db.base(sql, {}, callback => {
-    // 当前用户没有此商品就新增
-    if (callback[0].total === 0) {
-      let insertSql = `insert into userGoodsList set ?`;
-      db.base(insertSql, req.body, insertBack => {
-        if (insertBack) {
-          res.end(
-            JSON.stringify({
-              errCode: 0,
-              message: '已加入购物车'
-            })
-          );
-        } else {
-          res.end(
-            JSON.stringify({
-              errCode: 1,
-              message: '插入失败'
-            })
-          );
+    if (!callback[0].goods_sesson) {
+      let arr = [
+        {
+          art_id: req.body.artId,
+          buy_num: req.body.buyNum
         }
-      });
+      ];
+      // 如果没有商品信息 就直接更新
+      goodsInfoUpdate(arr, req.body.userName, res);
     } else {
-      // 如果有就更新数据
-      let updateSql = `update userGoodsList set buyNum='${req.body.buyNum}' where artId = '${req.body.artId}' and userName = '${req.body.userName}'`;
-      db.base(updateSql, {}, updateBack => {
-        console.log(updateBack.affectedRows);
-
-        if (updateBack.affectedRows !== 0) {
-          res.end(
-            JSON.stringify({
-              errCode: 0,
-              message: '更新成功'
-            })
-          );
-        } else {
-          res.end(
-            JSON.stringify({
-              errCode: 1,
-              message: '更新失败'
-            })
-          );
+      // 如果查询到了商品信息
+      let goodsSesson = JSON.parse(callback[0].goods_sesson);
+      let hasGoods = false;
+      goodsSesson.map(cur => {
+        if (cur.art_id === req.body.artId) {
+          // 如果有一样的商品 就更新购买数量
+          cur.buy_num = req.body.buyNum;
+          hasGoods = true;
         }
       });
+      // 如果没有找到商品就将当前商品push到数组
+      if (!hasGoods) {
+        goodsSesson.push({
+          art_id: req.body.artId,
+          buy_num: req.body.buyNum
+        });
+      }
+
+      goodsInfoUpdate(goodsSesson, req.body.userName, res);
+    }
+  });
+};
+// 封装更新商品信息的公共方法
+let goodsInfoUpdate = (arr, userName, res) => {
+  arr = JSON.stringify(arr);
+  let insertSql = `update userinfo set goods_sesson = '${arr}' where username='${userName}'`;
+  db.base(insertSql, {}, insertBack => {
+    if (insertBack.affectedRows === 1) {
+      reqsBack(0, 'success', res);
+    } else {
+      reqsBack(1, 'err', res, '添加失败！请稍后重试');
     }
   });
 };
 // 获取购物车商品信息
 exports.getUserCar = (req, res) => {
-  let selectSql = `select * from usergoodslist where username = '${req.query.userName}'`;
-  db.base(selectSql, {}, callback => {
-    let goodsSes = [];
-    if (callback && callback.length !== 0) {
-      for (let i = 0; i < callback.length; i++) {
-        let selectSql = `select * from goodsinfo where id = ${callback[i].artId}`;
-        db.base(selectSql, {}, seleBack => {
-          let obj = {
-            title: seleBack[0].title,
-            price: seleBack[0].sell_price,
-            buyNum: callback[i].buyNum,
-            totalPrice: callback[i].buyNum * seleBack[0].sell_price,
-            artId: callback[i].artId,
-            stock_quantity: seleBack[0].stock_quantity,
-            choose: true
-          };
-          goodsSes.push(obj);
-          if (i === callback.length - 1) {
-            let backObj = {
-              data: goodsSes,
-              message: '信息获取成功'
-            };
-            reqsBack(0, backObj, res);
-          }
+  // 首先查询到当前用户的商品信息
+  let selectUser = `select goods_sesson from userinfo where username = '${req.query.userName}'`;
+  db.base(selectUser, {}, selBack => {
+    if (!selBack) {
+      reqsBack(0, 'err', res);
+      return;
+    }
+    if (selBack[0].goods_sesson) {
+      let arr = JSON.parse(selBack[0].goods_sesson);
+      if (arr.length) {
+        let backarr = [];
+        arr.map((cur, index) => {
+          // 根据商品id获取商品信息
+          let sql = `select * from goodsinfo where id = ${cur.art_id}`;
+          db.base(sql, {}, callback => {
+            // console.log(callback);
+            if (callback) {
+              let obj = {
+                title: callback[0].title,
+                price: callback[0].sell_price,
+                buyNum: cur.buy_num,
+                totalPrice: cur.buy_num * callback[0].sell_price,
+                artId: cur.art_id,
+                stock_quantity: callback[0].stock_quantity,
+                choose: true
+              };
+              backarr.push(obj);
+              // 如果当前id等于数组的最后一位的索引就返回信息
+              if (index === arr.length - 1) {
+                let backObj = {
+                  data: backarr,
+                  message: '信息获取成功'
+                };
+                reqsBack(0, backObj, res);
+              }
+            }
+          });
         });
       }
-    } else {
-      reqsBack(0, '当前购物车为空', res);
     }
   });
 };
